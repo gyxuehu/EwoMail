@@ -1,0 +1,90 @@
+{include file="$HOME/header.html"}
+
+<div class="admin">
+	<form method="post" class="form-x" action="" id="myform">
+		<div class="form-group">
+			<div class="label">
+				<label for="readme">{$L.2002}</label>
+			</div>
+			<div class="field">
+				<input type="text" class="input" name="title" size="50" value="{$row.title}" data-validate="required:{$L.1107}{$L.2002}"  />
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<div class="label">
+				<label for="readme">{$L.2004}</label>
+			</div>
+			<div class="label label-text">
+				<div class="panel admin-panel">
+				<table class="table table-hover">
+					<tr>
+						<th width="200">{$L.2005}</th>
+						<th>{$L.2006}</th>
+						
+					</tr>
+					{foreach $menu as $v}
+					<tr>
+						<td align="center">{$v.title}&nbsp;&nbsp;<i class="icon-angle-down"></i></td>
+						<td><a class="button border-blue button-little" href="javascript:;" onclick="group_sd({$v.menu_id})">{$L.1102}</a></td>
+					</tr>
+					{foreach $v.child as $d}
+					<tr>
+						<td align="right">{$d.title}&nbsp;&nbsp;<i class="icon-angle-right"></i></td>
+						<td class="group-sd group-id-{$d.top_id}">
+							<label>{$L.1105}<input type="checkbox" name="auth[{$d.menu_id}][view]" value="1" {if $d.view_sd}checked="checked"{/if}  /></label>
+							{if $d.edit}
+								<label>{$L.2007}<input type="checkbox" name="auth[{$d.menu_id}][edit]" value="1" {if $d.edit_sd}checked="checked"{/if} /></label>
+							{/if}
+							
+							{if $d.del}
+								<label>{$L.1104}<input type="checkbox" name="auth[{$d.menu_id}][del]" value="1" {if $d.del_sd}checked="checked"{/if} /></label>
+							{/if}
+							<input type="hidden" name="auth[{$d.menu_id}][menu_id]" value="{$d.menu_id}" />
+						</td>
+					</tr>
+					{/foreach}
+					{/foreach}
+				</table>
+				</div>
+			</div>
+		</div>
+		
+		<div class="form-button">
+			<input type="hidden" name="_method" value="put" />
+			<input type="hidden" name="_forward" value="{asForward($row,'Group')}" />
+			<button class="button bg-main" type="submit" id="mysubmit">{$L.1108}</button>
+		</div>
+		
+
+		
+	</form>
+	
+	<script>
+		$(function(){
+			
+			//提交数据
+			$("#mysubmit").click(function(){
+				$("#myform").putData();
+				return false;
+			})
+			
+		})
+		function group_sd(id)
+		{
+			var obj = $(".group-id-"+id);
+			var sd = obj.data("sd");
+			if(!sd){
+				sd = true;
+				obj.find('input[type="checkbox"]').prop("checked",true);
+			}else{
+				sd = false;
+				obj.find('input[type="checkbox"]').prop("checked",false);
+			}
+			obj.data("sd",sd);
+			
+		}
+		
+	</script>
+</div>
+{include file="$HOME/footer.html"}

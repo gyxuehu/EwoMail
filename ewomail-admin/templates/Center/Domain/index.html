@@ -1,0 +1,61 @@
+{include file="$HOME/header.html"}
+<div class="admin">
+	<form method="post">
+		<div class="panel admin-panel">
+			<div class="panel-head"><strong>{$L.1101}</strong></div>
+			<div class="padding border-bottom">
+				<a href="{U('Domain/edit')}" class="button button-small border-green">{$L.1100}</a>
+			</div>
+			<table class="table table-hover">
+				<tr>
+					<th>{$L.90103}</th>
+					<th width="100">{$L.1113}</th>
+					<th width="200">{$L.1114}</th>
+					<th width="200">{$L.1106}</th>
+				</tr>
+				{foreach $list as $v}
+				<tr>
+					<td>{$v.name}</td>
+					<td>
+						{if $v.active==1}{$L.1111}{else}<font color="#FF0000">{$L.1110}</font>{/if}
+					</td>
+					<td>{$v.ctime}</td>
+					<td>
+					
+					<a class="button border-blue button-little" href="{U('Domain/edit',"id={$v.id}")}">{$L.1103}</a> 
+					<a class="button border-yellow button-little" href="#" onclick="return delOne('{U('Domain',"id={$v.id}")}')">{$L.1104}</a>
+					
+					</td>
+				</tr>
+				{/foreach}
+				
+				
+			</table>
+			<div class="page">{$page}</div>
+			
+		</div>
+	</form>
+</div>
+<script>
+	$(function(){
+		$(".dkim").click(function(){
+			var ii = layer.load();
+			var url = $(this).attr('href');
+			var title = $(this).attr('domain');
+			$.get(url,function(html){
+				var html = read(html)
+				layer.close(ii);
+				layer.open({
+				  id:"_ajax_rec",
+				  type:1,
+				  area: ['800px'],
+				  title:title,
+				  content: html
+				  
+				});
+			})
+			return false;
+		});
+	})
+</script>
+{include file="$HOME/footer.html"}

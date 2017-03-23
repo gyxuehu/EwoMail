@@ -1,0 +1,15 @@
+driver = mysql
+
+connect = host=127.0.0.1 dbname=ewomail user=ewomail password=123456
+
+default_pass_scheme = MD5
+#default_pass_scheme = CRYPT
+
+user_query = \
+  SELECT maildir AS home \
+  FROM i_users WHERE email='%u'
+  
+# Query to get a list of all usernames.
+iterate_query = SELECT email AS user FROM i_users
+
+password_query = SELECT u.password FROM i_users as u INNER JOIN i_domains as d ON u.domain_id=d.id WHERE u.email='%u' and u.active=1 and d.active=1;

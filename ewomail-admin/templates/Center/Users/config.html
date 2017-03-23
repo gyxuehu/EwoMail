@@ -1,0 +1,72 @@
+{include file="$HOME/header.html"}
+<div class="admin">
+	<div class="panel panel-query">
+		<div class="panel-head">
+			<strong>{$L.1204}</strong>
+		</div>
+		<div class="panel-body">
+			<form method="post" class="form-x" action="" id="basic">
+			
+			<div class="form-group">
+				<div class="label">
+					<label for="readme">{$L.3036}</label>
+				</div>
+				<div class="field">
+					<input type="text" class="input tips" name="data[myhostname]" size="50" value="{$row.myhostname}"  data-validate="required:{$L.1107}{$L.3036}" title="{$L.3040}mail.test.com" />
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<div class="label">
+					<label for="readme">{$L.3037}</label>
+				</div>
+				<div class="field">
+					<input type="text" class="input tips" name="data[mydomain]" size="50" value="{$row.mydomain}"  data-validate="required:{$L.1107}{$L.3037}" title="{$L.3040}test.com" />
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<div class="label">
+					<label for="readme">{$L.3038}</label>
+				</div>
+				<div class="field">
+					<input type="text" class="input tips" name="data[imap]" size="50" value="{$row.imap}"  data-validate="required:{$L.1107}{$L.3038}" title="{$L.3040}imap.test.com" />
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<div class="label">
+					<label for="readme">{$L.3039}</label>
+				</div>
+				<div class="field">
+					<input type="text" class="input tips" name="data[smtp]" size="50" value="{$row.smtp}"  data-validate="required:{$L.1107}{$L.3039}" title="{$L.3040}smtp.test.com" />
+				</div>
+			</div>
+
+			<div class="form-button">
+				<input type="hidden" name="_method" value="put" />
+				<input type="hidden" name="type" value="basic" />
+				
+				<button class="button bg-main" type="submit" id="mysubmit_basic">{$L.1108}</button>
+			</div>
+		</form>
+		</div>
+	</div>
+	
+	
+	
+	<script>
+		$(function(){
+			
+			//提交数据
+			$("#mysubmit_basic").click(function(){
+				$("#basic").putData();
+				return false;
+			})
+			
+
+		})
+		
+	</script>
+</div>
+{include file="$HOME/footer.html"}

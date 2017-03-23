@@ -1,0 +1,395 @@
+#!/usr/bin/perl
+
+# postfix-policyd-spf-perl
+# http://www.openspf.org/Software
+# version 2.010
+#
+# (C) 2007-2008,2012 Scott Kitterman <scott@kitterman.com>
+# (C) 2012           Allison Randal <allison@perl.org>
+# (C) 2007           Julian Mehnle <julian@mehnle.net>
+# (C) 2003-2004      Meng Weng Wong <mengwong@pobox.com>
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License along
+#    with this program; if not, write to the Free Software Foundation, Inc.,
+#    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+use version; our $VERSION = qv('2.010');
+
+use strict;
+
+use IO::Handle;
+use Sys::Syslog qw(:DEFAULT setlogsock);
+use NetAddr::IP;
+use Mail::SPF;
+use Sys::Hostname::Long 'hostname_long';
+
+# ----------------------------------------------------------
+#                      configuration
+# ----------------------------------------------------------
+
+my $resolver = Net::DNS::Resolver->new(
+    retrans         => 5,  # Net::DNS::Resolver default: 5
+    retry           => 2,  # Net::DNS::Resolver default: 4
+    # Makes for a total timeout for UDP queries of 5s * 2 = 10s.
+);
+
+# query_rr_type_all will query both type TXT and type SPF. This upstream
+# default is changed due to there being essentiall no type SPF deployment.
+my $spf_server = Mail::SPF::Server->new(
+    dns_resolver    => $resolver,
+    query_rr_types  => Mail::SPF::Server->query_rr_type_txt,
+    default_authority_explanation  =>
+    'Please see http://www.openspf.net/Why?s=%{_scope};id=%{S};ip=%{C};r=%{R}'
+);
+
+# Adding more handlers is easy:
+my @HANDLERS = (
+    {
+        name => 'exempt_localhost',
+        code => \&exempt_localhost
+    },
+    {
+        name => 'exempt_relay',
+        code => \&exempt_relay
+    },
+    {
+        name => 'sender_policy_framework',
+        code => \&sender_policy_framework
+    }
+);
+
+my $VERBOSE = 0;
+
+my $DEFAULT_RESPONSE = 'DUNNO';
+
+#
+# Syslogging options for verbose mode and for fatal errors.
+# NOTE: comment out the $syslog_socktype line if syslogging does not
+# work on your system.
+#
+
+my $syslog_socktype = 'unix'; # inet, unix, stream, console
+my $syslog_facility = 'mail';
+my $syslog_options  = 'pid';
+my $syslog_ident    = 'postfix/policy-spf';
+
+use constant localhost_addresses => map(
+    NetAddr::IP->new($_),
+    qw(  127.0.0.0/8  ::ffff:127.0.0.0/104  ::1  )
+);  # Does Postfix ever say "client_address=::ffff:<ipv4-address>"?
+
+use constant relay_addresses => map(
+    NetAddr::IP->new($_),
+    qw(  )
+); # add addresses to qw (  ) above separated by spaces using CIDR notation.
+
+# Fully qualified hostname, if available, for use in authentication results
+# headers now provided by the localhost and whitelist checks.
+my  $host = hostname_long;
+
+my %results_cache;  # by message instance
+
+# ----------------------------------------------------------
+#                      initialization
+# ----------------------------------------------------------
+
+#
+# Log an error and abort.
+#
+sub fatal_exit {
+    syslog(err     => "fatal_exit: @_");
+    syslog(warning => "fatal_exit: @_");
+    syslog(info    => "fatal_exit: @_");
+    die("fatal: @_");
+}
+
+#
+# Unbuffer standard output.
+#
+STDOUT->autoflush(1);
+
+#
+# This process runs as a daemon, so it can't log to a terminal. Use
+# syslog so that people can actually see our messages.
+#
+setlogsock($syslog_socktype);
+openlog($syslog_ident, $syslog_options, $syslog_facility);
+
+# ----------------------------------------------------------
+#                           main
+# ----------------------------------------------------------
+
+#
+# Receive a bunch of attributes, evaluate the policy, send the result.
+#
+my %attr;
+while (<STDIN>) {
+    chomp;
+    
+    if (/=/) {
+        my ($key, $value) =split (/=/, $_, 2);
+        $attr{$key} = $value;
+        next;
+    }
+    elsif (length) {
+        syslog(warning => sprintf("warning: ignoring garbage: %.100s", $_));
+        next;
+    }
+    
+    if ($VERBOSE) {
+        for (sort keys %attr) {
+            syslog(debug => "Attribute: %s=%s", $_ || '<UNKNOWN>', $attr{$_} || '<UNKNOWN>');
+        }
+    };
+    
+    my $message_instance = $attr{instance};
+    my $cache = defined($message_instance) ? $results_cache{$message_instance} ||= {} : {};
+    
+    my $action = $DEFAULT_RESPONSE;
+    
+    foreach my $handler (@HANDLERS) {
+        my $handler_name = $handler->{name};
+        my $handler_code = $handler->{code};
+        
+        my $response = $handler_code->(attr => \%attr, cache => $cache);
+        
+        if ($VERBOSE) {
+            syslog(debug => "handler %s: %s", $handler_name || '<UNKNOWN>', $response || '<UNKNOWN>');
+        };
+        
+        # Pick whatever response is not 'DUNNO'
+        if ($response and $response !~ /^DUNNO/i) {
+                if ($VERBOSE) {
+                    syslog(info => "handler %s: is decisive.", $handler_name || '<UNKNOWN>');
+                }
+            $action = $response;
+            last;
+        }
+    }
+    
+    syslog(info => "Policy action=%s", $action || '<UNKNOWN>');
+    
+    STDOUT->print("action=$action\n\n");
+    %attr = ();
+}
+
+# ----------------------------------------------------------
+#                handler: localhost exemption
+# ----------------------------------------------------------
+
+sub exempt_localhost {
+    my %options = @_;
+    my $attr = $options{attr};
+    if ($attr->{client_address} ne '') {
+        my $client_address = NetAddr::IP->new($attr->{client_address});
+        return "PREPEND Authentication-Results: $host; none (SPF not checked for localhost)"
+            if grep($_->contains($client_address), localhost_addresses);
+    };
+    return 'DUNNO';
+}
+
+# ----------------------------------------------------------
+#                handler: relay exemption
+# ----------------------------------------------------------
+
+sub exempt_relay {
+    my %options = @_;
+    my $attr = $options{attr};
+    if ($attr->{client_address} ne '') {
+        my $client_address = NetAddr::IP->new($attr->{client_address});
+        return "PREPEND Authentication-Results: $host; none (SPF not checked for whitelisted relay)"
+            if grep($_->contains($client_address), relay_addresses);
+    };
+    return 'DUNNO';
+}
+
+# ----------------------------------------------------------
+#                        handler: SPF
+# ----------------------------------------------------------
+
+sub sender_policy_framework {
+    my %options = @_;
+    my $attr    = $options{attr};
+    my $cache   = $options{cache};
+    
+    # -------------------------------------------------------------------------
+    # Always do HELO check first.  If no HELO policy, it's only one lookup.
+    # This avoids the need to do any MAIL FROM processing for null sender.
+    # -------------------------------------------------------------------------
+    
+    my $helo_result = $cache->{helo_result};
+    
+    if (not defined($helo_result)) {
+        # No HELO result has been cached from earlier checks on this message.
+        
+        my $helo_request = eval {
+            Mail::SPF::Request->new(
+                scope           => 'helo',
+                identity        => $attr->{helo_name},
+                ip_address      => $attr->{client_address}
+            );
+        };
+        
+        if ($@) {
+            # An unexpected error occurred during request creation,
+            # probably due to invalid input data!
+            my $errmsg = $@;
+            $errmsg = $errmsg->text if UNIVERSAL::isa($@, 'Mail::SPF::Exception');
+                if ($VERBOSE) {
+                    syslog(
+                    info => "HELO check failed - Mail::SPF->new(%s, %s, %s) failed: %s",
+                    $attr->{client_address} || '<UNKNOWN>',
+                    $attr->{sender} || '<UNKNOWN>', $attr->{helo_name} || '<UNKNOWN>',
+                    $errmsg || '<UNKNOWN>'
+                    );
+                };
+            return;
+        }
+        
+        $helo_result = $cache->{helo_result} = $spf_server->process($helo_request);
+    }
+    
+    my $helo_result_code    = $helo_result->code;  # 'pass', 'fail', etc.
+    my $helo_local_exp      = nullchomp($helo_result->local_explanation);
+    my $helo_authority_exp  = nullchomp($helo_result->authority_explanation)
+        if $helo_result->is_code('fail');
+    my $helo_spf_header     = $helo_result->received_spf_header;
+    
+    if ($VERBOSE) {
+        syslog(
+            info => "SPF %s: HELO/EHLO: %s, IP Address: %s, Recipient: %s",
+            $helo_result  || '<UNKNOWN>',
+            $attr->{helo_name} || '<UNKNOWN>', $attr->{client_address} || '<UNKNOWN>',
+            $attr->{recipient} || '<UNKNOWN>'
+        );
+    };
+    
+    # Reject on HELO fail.  Defer on HELO temperror if message would otherwise
+    # be accepted.  Use the HELO result and return for null sender.
+    if ($helo_result->is_code('fail')) {
+        if ($VERBOSE) {
+            syslog(
+                info => "SPF %s: HELO/EHLO: %s",
+                $helo_result || '<UNKNOWN>',
+                $attr->{helo_name} || '<UNKNOWN>'
+            );
+        };
+        return "550 $helo_authority_exp";
+    }
+    elsif ($helo_result->is_code('temperror')) {
+        if ($VERBOSE) {
+            syslog(
+                info => "SPF %s: HELO/EHLO: %s",
+                $helo_result || '<UNKNOWN>',
+                $attr->{helo_name} || '<UNKNOWN>'
+            );
+        };
+        return "DEFER_IF_PERMIT SPF-Result=$helo_local_exp";
+    }
+    elsif ($attr->{sender} eq '') {
+        if ($VERBOSE) {
+            syslog(
+                info => "SPF %s: HELO/EHLO (Null Sender): %s",
+                $helo_result || '<UNKNOWN>',
+                $attr->{helo_name} || '<UNKNOWN>'
+            );
+        };
+        return "PREPEND $helo_spf_header"
+            unless $cache->{added_spf_header}++;
+    }
+    
+    # -------------------------------------------------------------------------
+    # Do MAIL FROM check (as HELO did not give a definitive result)
+    # -------------------------------------------------------------------------
+    
+    my $mfrom_result = $cache->{mfrom_result};
+    
+    if (not defined($mfrom_result)) {
+        # No MAIL FROM result has been cached from earlier checks on this message.
+        
+        my $mfrom_request = eval {
+            Mail::SPF::Request->new(
+                scope           => 'mfrom',
+                identity        => $attr->{sender},
+                ip_address      => $attr->{client_address},
+                helo_identity   => $attr->{helo_name}  # for %{h} macro expansion
+            );
+        };
+        
+        if ($@) {
+            # An unexpected error occurred during request creation,
+            # probably due to invalid input data!
+            my $errmsg = $@;
+            $errmsg = $errmsg->text if UNIVERSAL::isa($@, 'Mail::SPF::Exception');
+            if ($VERBOSE) {
+                syslog(
+                    info => "Mail From (sender) check failed - Mail::SPF->new(%s, %s, %s) failed: %s",
+                    $attr->{client_address} || '<UNKNOWN>',
+                    $attr->{sender} || '<UNKNOWN>', $attr->{helo_name} || '<UNKNOWN>', $errmsg || '<UNKNOWN>'
+                );
+            };
+            return;
+        } 
+        
+        $mfrom_result = $cache->{mfrom_result} = $spf_server->process($mfrom_request);
+    }
+    
+    my $mfrom_result_code   = $mfrom_result->code;  # 'pass', 'fail', etc.
+    my $mfrom_local_exp     = nullchomp($mfrom_result->local_explanation);
+    my $mfrom_authority_exp = nullchomp($mfrom_result->authority_explanation)
+        if $mfrom_result->is_code('fail');
+    my $mfrom_spf_header    = $mfrom_result->received_spf_header;
+    
+    if ($VERBOSE) {
+        syslog(
+            info => "SPF %s: Envelope-from: %s, IP Address: %s, Recipient: %s",
+            $mfrom_result || '<UNKNOWN>',
+            $attr->{sender} || '<UNKNOWN>', $attr->{client_address} || '<UNKNOWN>',
+            $attr->{recipient} || '<UNKNOWN>'
+        );
+    };
+    
+    # Same approach as HELO....
+    if ($VERBOSE) {
+        syslog(
+            info => "SPF %s: Envelope-from: %s",
+            $mfrom_result || '<UNKNOWN>',
+            $attr->{sender} || '<UNKNOWN>'
+        );
+    };
+    if ($mfrom_result->is_code('fail')) {
+        return "550 $mfrom_authority_exp";
+    }
+    elsif ($mfrom_result->is_code('temperror')) {
+        return "DEFER_IF_PERMIT SPF-Result=$mfrom_local_exp";
+    }
+    else {
+        return "PREPEND $mfrom_spf_header"
+            unless $cache->{added_spf_header}++;
+    }
+    
+    return;
+}
+
+# ----------------------------------------------------------
+#                   utility, string cleaning
+# ----------------------------------------------------------
+
+sub nullchomp {
+    my $value = shift;
+
+    # Remove one or more null characters from the
+    # end of the input.
+    $value =~ s/\0+$//;
+    return $value;
+}

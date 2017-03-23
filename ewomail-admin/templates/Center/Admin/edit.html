@@ -1,0 +1,166 @@
+{include file="$HOME/header.html"}
+<div class="admin">
+	<form method="post" class="form-x" action="" id="myform">
+		<div class="form-group">
+			<div class="label">
+				<label for="readme">{$L.2008}</label>
+			</div>
+			<div class="field">
+				<input type="text" class="input" name="username" size="50" value="{$row.username}" placeholder="{$L.2009}" data-validate="required:{$L.1107}{$L.2008}" {if $row} disabled="disabled" {/if} />
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="label">
+				<label for="readme">{$L.2010}</label>
+			</div>
+			<div class="field">
+				<input type="text" class="input" name="name" size="50" value="{$row.name}" data-validate="required:{$L.1107}{$L.2010}" />
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<div class="label">
+				<label>{$L.1113}</label>
+			</div>
+			<div class="field">
+				<div class="button-group button-group-small radio">
+					<label class="button active">
+						<input name="active" value="1" checked="checked" type="radio"><span class="icon icon-check"></span>{$L.1111}</label>
+					<label class="button">
+						<input name="active" value="0" type="radio"><span class="icon icon-check"></span>{$L.1110}</label>
+				</div>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<div class="label">
+				<label title="{$L.3077}">{$L.3077}</label>
+			</div>
+			<div class="field">
+				<div class="button-group button-group-small radio">
+					<label class="button active">
+						<input name="is_webmail" value="0" checked="checked" type="radio"><span class="icon icon-check"></span>{$L.1110}</label>
+					<label class="button">
+						<input name="is_webmail" value="1" type="radio"><span class="icon icon-check"></span>{$L.1111}</label>
+				</div>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<div class="label">
+				<label>{$L.2011}</label>
+			</div>
+			<div class="field">
+				<div class="button-group button-group-small radio">
+					<label class="button active">
+						<input name="super" value="0" checked="checked" type="radio"><span class="icon icon-check"></span>{$L.2012}</label>
+					<label class="button">
+						<input name="super" value="1" type="radio"><span class="icon icon-check"></span>{$L.2013}</label>
+				</div>
+			</div>
+		</div>
+		
+		
+		<div class="form-group" id="group" style="display:none">
+			<div class="label">
+				<label for="readme">{$L.2014}</label>
+			</div>
+			<div class="field">
+				<select class="input" name="gid">
+					<option value="0">{$L.1109}</option>
+					{foreach $group as $v}
+					<option value="{$v.gid}" {if $v.gid==$row.gid} selected="selected" {/if}>{$v.title}</option>
+					{/foreach}
+				</select>
+			</div>
+		</div>
+
+		{if $row}
+		<div class="form-group">
+			<div class="label">
+				<label>{$L.2015}</label>
+			</div>
+			<div class="field">
+				<div class="button-group button-group-small radio">
+					<label class="button active">
+						<input name="is_password" value="0" checked="checked" type="radio"><span class="icon icon-check"></span>{$L.1110}</label>
+					<label class="button">
+						<input name="is_password" value="1" type="radio"><span class="icon icon-check"></span>{$L.1111}</label>
+				</div>
+			</div>
+		</div>
+		{/if}
+		<div class="form-group form-password">
+			<div class="label">
+				<label for="readme">{$L.2016}</label>
+			</div>
+			<div class="field">
+				<input type="password" class="input" name="password" size="50" placeholder="{$L.2017}" data-validate="required:{$L.1107}{$L.2016}" />
+			</div>
+		</div>
+		<div class="form-group form-password">
+			<div class="label">
+				<label for="readme">{$L.2018}</label>
+			</div>
+			<div class="field">
+				<input type="password" class="input" name="password2" size="50" placeholder="{$L.2017}"  data-validate="required:{$L.1107}{$L.2018}" />
+			</div>
+		</div>
+		<div class="form-button">
+			<input type="hidden" name="_method" value="put" />
+			<input type="hidden" name="_forward" value="{asForward($row,'Admin')}" />
+			<button class="button bg-main" type="submit" id="mysubmit">{$L.1108}</button>
+		</div>
+	</form>
+	<script>
+		$(function(){
+			
+			//提交数据
+			$("#mysubmit").click(function(){
+				$("#myform").putData();
+				return false;
+			})
+			
+			//密码事件
+			if($("input[name='is_password']").length>0){
+				$(".form-password").hide();
+				$(".form-password").find("input[type='password']").attr("data-validate","");
+			}
+			
+			$("input[name='is_password']").change(function(){
+				var v = $(this).val();
+				if(v=='1'){
+					$(".form-password").show();
+				}else{
+					$(".form-password").hide();
+				}
+			})
+			
+			$("input[name='super']").change(function(){
+				var v = $(this).val();
+				if(v=='0'){
+					$("#group").show();
+				}else{
+					$("#group").hide();
+				}
+			})
+			
+			var supers = '{$row.super}';
+			if(supers=='') supers = '0';
+			
+			$("input[name='super'][value='"+supers+"']").trigger("change").trigger("click");
+			
+			var is_webmail = '{$row.is_webmail}';
+			if(is_webmail=='') is_webmail = '0';
+			
+			var active = '{$row.active}';
+			if(active=='') active = '1';
+			
+			$("input[name='is_webmail'][value='"+is_webmail+"']").trigger("change").trigger("click");
+			$("input[name='active'][value='"+active+"']").trigger("change").trigger("click");
+			
+		})
+		
+	</script>
+</div>
+{include file="$HOME/footer.html"}

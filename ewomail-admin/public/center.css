@@ -1,0 +1,119 @@
+/*
+// +----------------------------------------------------------------------
+// | EwoMail
+// +----------------------------------------------------------------------
+// | Copyright (c) 2016 http://ewomail.com All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://ewomail.com/license.html)
+// +----------------------------------------------------------------------
+// | Author: EwoMail
+// +----------------------------------------------------------------------
+*/
+body {
+	background-color:#3d3d3d;
+	color:#333;
+}
+
+a:focus{outline: none;}
+.form-x .form-group .label { width:10%;}
+.form-x .form-group .field { width:90%;}
+.form-x .form-group .label-text { width:90%; text-align:left}
+.form-inline .form-group .input-group select{-webkit-appearance:menulist}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+	.form-inline .form-group .input-group .input{ margin-right:5px;}
+}
+
+.panel-query { margin-bottom:5px;}
+
+.login > .container{ padding:10px; margin-top:8%; text-align:center;}
+
+.login > .container > h1{ font-size:30px;}
+.login > .container > h3{ margin-top:20px;}
+.login > .container > .form { width:300px; margin:auto; padding-top:20px;}
+
+
+.field-text{line-height:35px;}
+
+.header { width:100%; height:46px; background-color:#1f1f1f;}
+.header-logo { float:left; line-height:46px; color:#FFFFFF; padding-left:20px; font-size:20px;}
+.header-text { float:right; color:#FFFFFF;line-height:46px; margin-right:30px;}
+.header-button { float:right;}
+.header-button > a ,.header-button .button-group > a {height:46px;border-radius:0px; line-height:30px; margin:0px; display:block; float:left; font-weight:bold;}
+.header-button .button-group {float:left;}
+
+
+.main {position:relative;}
+.main-left { width:235px;margin-right:-100%;position:relative; float:left;display:block;height:auto;overflow:visible;}
+.main-left-list > li > a { padding:10px 15px;margin:0;text-decoration:none;font-size:14px; display:block;font-weight:300; color:#d9d9d9; border-top:1px solid #484848; position:relative;}
+.main-left-list > li > a:hover {background:#303030;}
+.main-left-list > li > .hover {background:#303030;} 
+.main-left-list > li > a > .icon { float:right;font-size:16px; margin-right:5px;}
+.main-left-list > li > a > .selected {
+  border-bottom: 12px solid transparent;
+  border-right: 12px solid #ffffff;
+  border-top: 12px solid transparent;
+  display: block;
+  float: right;
+  height: 0;
+  position: absolute;
+  right: 0;
+  top: 8px;
+  width: 0;
+}
+.main-left-list > li > a > i { margin-right:5px; color:#888888; font-size:18px;}
+
+.main-left-list > .active > a { background:#d64635; color:white;}
+.main-left-list > .active > a:hover{background:#d64635; }
+.main-left-list > .active > a > i { color:#FFFFFF;}
+
+.main-left-menu { margin:8px 0;display:none}
+.main-left-menu > li { margin-top:1px;}
+.main-left-menu > li > a { padding:6px 15px 6px 43px;margin:0;text-decoration:none;font-size:14px; display:block;font-weight:300; color:#bdbdbd;}
+.main-left-menu > li > a:hover{ background:#474747;}
+.main-left-menu > li > a > i {margin-right:5px; color:#888888;}
+.main-left-menu > li > a:hover > i {color:#bdbdbd}
+.main-left-menu > .active > a { background:#474747;}
+.main-left-menu > .active > a > i { color:#bdbdbd}
+
+
+.main-right {margin-left:235px; background-color:#FFFFFF;min-height:900px; padding:10px;}
+.main-right .page-bar { background:#f7f7f7; width:100%; padding:10px; margin-bottom:25px; color:#888;}
+.main-right .page-bar > span { margin-left:10px; margin-right:10px;}
+
+.main-right .group-sd label { font-weight:normal; margin-right:5px;}
+
+.system-count {margin-bottom:20px;}
+.system-count ul li { float:left; text-align:center; margin-left:2.5%; color:#FFFFFF; height:100px; line-height:100px; font-size:20px;}
+
+.footer { padding:10px; color:#a3a3a3}
+
+.page {
+  background-color: #f5f5f5;
+  border-radius: 0 0 4px 4px;
+  border-top: 1px solid #ddd;
+  padding: 10px 15px;
+  width:100%; 
+  text-align:left; 
+
+}
+.page a ,.page .rows,.page .current{
+  background-color: #fff;
+  border: 1px solid #ddd;
+  color: #337ab7;
+  display: inline-block;
+  line-height: 1.4;
+  margin-left: -1px;
+  padding: 6px 12px;
+  position: relative;
+  text-decoration: none;
+}
+.page a:hover,.page .current {
+  background-color: #eee;
+  border-color: #ddd;
+  color: #23527c;
+  z-index: 3;
+}
+
+.index_copyright { position:absolute; bottom:0; width:100%;}
+.index_copyright > .container { text-align:center;}
