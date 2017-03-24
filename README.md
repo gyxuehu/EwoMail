@@ -74,7 +74,7 @@ EwoMail-Admin集成了前端框架、后台敏捷开发框架，利用这些框�
 
 [EwoMail-Admin开发教程](http://doc.ewomail.com/ewomail-admin)
 
-![ewomail-admin](https://git.kancloud.cn/repos/ewomail/development/raw/master/image/screenshot_1489929530658.png?access-token=cc8ae4f653eccac798c91fe4fab1ef7a "ewomail-admin")
+![ewomail-admin](https://box.kancloud.cn/c362878ba731559b09eae36b7236bde5_1366x609.png "ewomail-admin")
 
 ### webmail
 
