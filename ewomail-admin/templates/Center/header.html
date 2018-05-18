@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>{$WEB_TITLE}-{$L.2035}</title>
+		<link rel="stylesheet" href="/public/pintuer.css">
+		<link rel="stylesheet" href="/public/center.css">
+		<link rel="stylesheet" href="/public/iconfont/iconfont.css">
+		<script src="/lang/{$LANG}.js"></script>
+		<script src="/public/jquery.js"></script>
+		<script src="/public/pintuer.js"></script>
+		<script src="/public/layer2.2/layer.js"></script>
+		<script src="/public/center.js"></script>
+	</head>
+
+	<body>
+		<div class="header">
+			<div class="header-logo">{$WEB_TITLE}</div>
+			<div class="header-button">
+				<a href="{U('/')}" class="button bg-main">{$L.3053}</a>
+				<a href="{U('Admin/user')}" class="button bg-sub">{$L.3054}</a>
+				<a href="{getMailUrl()}" class="button bg-yellow">{$L.3055}</a>
+				<div class="button-group">
+					<a href="JavaScript:;" class="button bg-red dropdown-hover">
+					{$L.1210}：{$LANG_NAME}<span class="downward"></span>
+					</a>
+					<ul class="drop-menu">
+						{foreach $L_ALL as $k=>$v}
+						<li><a href="{U('Index/lang',"lang=$k")}">{$v}</a> </li>
+						{/foreach}
+					</ul>
+				</div>
+				<a href="{U('System/out')}" class="button bg-gray">{$L.3056}</a>
+			</div>
+			<div class="header-text">{$L.3057}：{$adminData.username}[{$adminData.type_title}]</div>
+			
+		</div>
+		<div style="main">
+			
+			<div class="main-left">
+				<ul class="main-left-list list-unstyle">
+					{foreach $admin_menu as $v}
+					<li {if $v.sd}class="active"{/if}>
+						<a href="javascript:;">
+							<i class="iconfont iconn-{$v.lang}"></i>
+							<span>{$v.title}</span>
+						</a>
+						<ul class="main-left-menu list-unstyle">
+							{foreach $v.child as $d}
+							<li {if $d.sd}class="active"{/if}>
+								<a href="{U($d.url)}">
+									<i class="iconfont iconn-{$d.lang}"></i>
+									<span>{$d.title}</span>
+								</a>
+							</li>
+							{/foreach}
+						</ul>
+					</li>
+					{/foreach}
+					
+				</ul>
+			</div>
+			
+			<div style="float:left; width:100%;">
+				<div class="main-right">
+					{if $admin_bar}
+					<div class="page-bar">
+						{$admin_bar}
+					</div>
+					{/if}

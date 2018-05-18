@@ -1,0 +1,93 @@
+<div id="ajax_rec" style="padding:10px;">
+	
+	<div class="panel panel-query">
+		<div class="panel-head">
+			<strong>{$L.1117}</strong>
+		</div>
+		<div class="panel-body">
+			<form id="ajax_query" action="{U('Users/rec')}" class="form-inline">
+				<div class="form-group">
+					<div class="field">
+						<div class="input-group">
+							<span class="addon">{$L.3018}</span>
+							<input type="text" name="start_day" id="start_day" class="input" size="20" value="{$smarty.get.start_day}" />
+						</div>
+					</div>
+					<div class="field">
+						<div class="input-group">
+							<span class="addon">{$L.3019}</span>
+							<input type="text" name="end_day" id="end_day" class="input" size="20" value="{$smarty.get.end_day}" />
+						</div>
+					</div>
+					<div class="field">
+						<div class="input-group">
+							<input type="hidden" name="id" value="{$smarty.get.id}" />
+							<input type="submit" class="button" value="{$L.1118}" />
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	
+	
+	<div class="panel admin-panel">
+		<div class="panel-head">
+			<strong>{$L.1101}</strong>
+		</div>
+		<table class="table table-hover">
+			<tr>
+				<th>{$L.1119}</th>
+				<th width="200">{$L.3020}</th>
+				<th width="200">{$L.3021}</th>
+			</tr>
+			{foreach $list as $v}
+			<tr>
+				
+				<td>{$v.day}</td>
+				<td><span>{$v.s_num}</span>&nbsp;&nbsp;<a class="button border-blue button-little rec_clean" href="{U('Users/rec',"day_id={$v.day_id}&clean=s")}">{$L.1200}</a></td>
+				<td><span>{$v.c_num}</span>&nbsp;&nbsp;<a class="button border-blue button-little rec_clean" href="{U('Users/rec',"day_id={$v.day_id}&clean=c")}">{$L.1200}</a></td>
+			</tr>
+			{/foreach}
+		</table>
+		<div class="page">{$page}</div>
+	</div>
+	
+</div>
+
+<script>
+	$("#ajax_rec").ajaxPage();
+	$("#ajax_query").ajaxQuery();
+	$.datetimepicker.setLocale('ch');//设置中文
+	$('#start_day').datetimepicker({
+		autoclose:true,
+		format:"Y-m-d",
+		timepicker:false,
+		timepickerScrollbar:false
+	});
+	$('#end_day').datetimepicker({
+		autoclose:true,
+		format:"Y-m-d",
+		timepicker:false,
+		timepickerScrollbar:false
+	});
+	
+	$(".rec_clean").click(function(){
+		var url = $(this).attr("href");
+		var $this = this;
+		var data = [{
+            name:'_method',
+            value:'put'
+        }]
+		doConfirm("{$L.3022}",function(){
+			ajaxPost(url, data,function(d){
+				if(d.status==1){
+					$($this).parent().find("span").html("0");
+				}
+			});
+		});
+        
+		return false;
+	})
+	
+</script>

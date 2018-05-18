@@ -1,0 +1,44 @@
+{include file="$HOME/header.html"}
+<div class="admin">
+	<form method="post">
+		<div class="panel admin-panel">
+			<div class="panel-head"><strong>{$L.1101}</strong></div>
+			<div class="padding border-bottom">
+				<a href="{U('Admin/edit')}" class="button button-small border-green">{$L.1100}</a>
+			</div>
+			<table class="table table-hover">
+				<tr>
+					<th>{$L.2008}</th>
+					<th width="200">{$L.2010}</th>
+					<th width="150">{$L.2014}</th>
+					<th width="200">{$L.1106}</th>
+				</tr>
+				{foreach $list as $v}
+				<tr>
+					<td>{$v.username}</td>
+					<td>{$v.name}</td>
+					<td>
+					{if $v.super}
+						{$L.2013}
+					{else if !$v.gid}
+						{$L.1109}
+					{else}
+						{$v.title}
+					{/if}
+					</td>
+					<td>
+					<a class="button border-blue button-little" href="{U('Admin/edit',"aid={$v.aid}")}">{$L.1103}</a> 
+					<a class="button border-yellow button-little" href="#" onclick="return delOne('{U('Admin',"aid={$v.aid}")}')">{$L.1104}</a>
+					
+					</td>
+				</tr>
+				{/foreach}
+				
+				
+			</table>
+			<div class="page">{$page}</div>
+			
+		</div>
+	</form>
+</div>
+{include file="$HOME/footer.html"}

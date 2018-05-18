@@ -1,0 +1,46 @@
+<div id="ajax_rec" style="padding:10px;">
+	
+	<div class="panel admin-panel">
+		<div class="panel-head">
+			<strong>{$L.3047}</strong>
+		</div>
+		<table class="table table-hover">
+			<tr>
+				<th width="100">{$L.3048}</th>
+				<th width="100">{$L.3049}</th>
+				<th>{$L.3050}</th>
+			</tr>
+			
+			<tr>
+				<td>TXT</td>
+				<td>dkim._domainkey</td>
+				<td><textarea class="input">{$data.key}</textarea></td>
+			</tr>
+			
+		</table>
+	</div>
+	
+	<div class="panel admin-panel" style="margin-top:10px;">
+		<div class="panel-head">
+			<strong>{$L.3051}</strong>
+		</div>
+		<table class="table table-hover">
+			<tr>
+				<th width="100">{$L.1208}</th>
+				<th>{$L.3052}</th>
+			</tr>
+			
+			<tr>
+				<td>{if $keysok}{$L.1206}{else}{$L.1207}{/if}</td>
+				<td>{$data.testkeys}</td>
+			</tr>
+			
+		</table>
+	</div>
+	
+</div>
+
+<script>
+	
+	
+</script>

@@ -1,0 +1,43 @@
+{include file="$HOME/header.html"}
+<div class="admin">
+	<form method="post">
+		<div class="panel admin-panel">
+			<div class="panel-head"><strong>{$L.1101}</strong></div>
+			<div class="padding border-bottom">
+				<a href="#" class="button button-small border-yellow" id="delAll">{$L.2043}</a>
+			</div>
+			<table class="table table-hover">
+				<tr>
+					<th width="200">{$L.2044}</th>
+					<th width="200">{$L.2045}</th>
+					<th>{$L.2046}</th>
+					<th width="200">{$L.1114}</th>
+				</tr>
+				{foreach $list as $v}
+				<tr>
+					<td>{$v.username}</td>
+					<td>{$v.ip}</td>
+					<td>{$v.explain}</td>
+					<td>{$v.ctime}</td>
+				</tr>
+				{/foreach}
+				
+				
+			</table>
+			<div class="page">{$page}</div>
+			
+		</div>
+	</form>
+</div>
+<script>
+	$("#delAll").click(function(){
+		doConfirm('{$L.2047}',function(){
+			var data = [{
+				name:'_method',
+				value:'delete'
+			}]
+			ajaxPost('', data);
+		})
+	})
+</script>
+{include file="$HOME/footer.html"}

@@ -1,0 +1,93 @@
+{include file="$HOME/header.html"}
+<div class="admin">
+	<div class="alert alert-red" style="margin-bottom:10px;">
+		<span class="close rotate-hover"></span>{$L.2038}<a href="{getMailUrl()}?admin" target="_blank">{$L.2039}</a>
+	</div>
+	{if $default_password}
+	<div class="alert alert-red" style="margin-bottom:10px;">
+		<span class="close rotate-hover"></span>{$L.2037}
+	</div>
+	{/if}
+	<div class="system-count">
+		<ul class="list-unstyle">
+			<li style="width:30%; background:#578ebe">{$L.90103}：{$data.domain_count}</li>
+			<li style="width:30%; background:#44b6ae;">{$L.3075}：{$data.users_count}</li>
+			<li style="width:30%; background:#8775a7">{$L.3076}：{$data.bytes_count}GB</li>
+		</ul>
+		<div class="clearfix"></div>
+	</div>
+	
+	<div class="panel admin-panel">
+		<div class="panel-head">
+			<strong>{$L.3061}</strong>
+		</div>
+		<table class="table table-hover">
+			<tr>
+				<td align="right" width="20%">{$L.3062}：</td>
+				<td>{$data.hostname}</td>
+				<td align="right" width="20%">{$L.3063}：</td>
+				<td>{$data.ip}</td>
+			</tr>
+			<tr>
+				<td align="right">{$L.3064}：</td>
+				<td>{$data.uname}</td>
+				<td align="right">{$L.3065}：</td>
+				<td>{$data.web}</td>
+			</tr>
+			<tr>
+				<td align="right">php：</td>
+				<td>{$data.php}</td>
+				<td align="right">mysql：</td>
+				<td>{$data.mysql}</td>
+			</tr>
+			<tr>
+				<td align="right">{$L.3066}：</td>
+				<td>{$data.upload_max_filesize}</td>
+				<td align="right">{$L.3067}：</td>
+				<td>{$data.post_max_size}</td>
+			</tr>
+			
+			<tr>
+				<td align="right">{$L.3069}：</td>
+				<td>{$data.version}</td>
+				<td align="right">{$L.3071}：</td>
+				<td><a href="http://www.ewomail.com" target="_blank">www.ewomail.com</a></td>
+			</tr>
+			
+		</table>
+	</div>
+	
+	<div class="panel admin-panel" style="margin-top:20px;">
+		<div class="panel-head"><strong>{$L.90206}</strong></div>
+		
+		<table class="table table-hover">
+			<tr>
+				<th width="200">{$L.2044}</th>
+				<th width="200">{$L.2045}</th>
+				<th>{$L.2046}</th>
+				<th width="200">{$L.1114}</th>
+			</tr>
+			{foreach $log_list as $v}
+			<tr>
+				<td>{$v.username}</td>
+				<td>{$v.ip}</td>
+				<td>{$v.explain}</td>
+				<td>{$v.ctime}</td>
+			</tr>
+			{/foreach}
+			
+			
+		</table>
+		<div class="page">{$page}</div>
+		
+	</div>
+	
+</div>
+<script>
+$(function(){
+	$.get('{U('System/version')}',function(html){
+		console.log(html)
+	})
+})
+</script>
+{include file="$HOME/footer.html"}

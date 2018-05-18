@@ -1,0 +1,117 @@
+{include file="$HOME/header.html"}
+<link rel="stylesheet" type="text/css" href="/public/datetimepicker/jquery.datetimepicker.css"/>
+<script src="/public/datetimepicker/build/jquery.datetimepicker.full.js"></script>
+<div class="admin">
+	<div class="panel panel-query">
+		<div class="panel-head">
+			<strong>{$L.1117}</strong>
+		</div>
+		<div class="panel-body">
+			<form method="get" class="form-inline">
+				<div class="form-group">
+					<div class="field">
+						<div class="input-group">
+							<span class="addon">{$L.1201}</span>
+							<select class="input" name="sort" id="sort">
+								<option value="">{$L.1202}</option>
+								<option value="gb:asc">{$L.3033}</option>
+								<option value="gb:desc">{$L.3034}</option>
+							</select>
+						</div>
+					</div>
+					<div class="field">
+						<div class="input-group">
+							<span class="addon">{$L.1113}</span>
+							<select class="input" name="active" id="active">
+								<option value="">{$L.1203}</option>
+								<option value="1">{$L.1111}</option>
+								<option value="0">{$L.1110}</option>
+							</select>
+						</div>
+					</div>
+					<div class="field">
+						<div class="input-group">
+							<span class="addon">{$L.3012}</span>
+							<input type="text" name="email" class="input" size="20" value="{$smarty.get.email}" />
+						</div>
+					</div>
+					<div class="field">
+						<div class="input-group">
+							<span class="addon">{$L.90103}</span>
+							<input type="text" name="domain" class="input" size="20" value="{$smarty.get.domain}" />
+						</div>
+					</div>
+					<div class="field">
+						<div class="input-group">
+							<input type="submit" class="button" value="{$L.1118}" />
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<form method="post">
+		<div class="panel admin-panel">
+			<div class="panel-head"><strong>{$L.1101}</strong></div>
+			<div class="padding border-bottom">
+				<a href="{U('Users/edit')}" class="button button-small border-green">{$L.1100}</a>
+			</div>
+			<table class="table table-hover">
+				<tr>
+					<th>{$L.3012}</th>
+					<th width="200">{$L.3023}</th>
+					<th width="200">{$L.3024}</th>
+					<th width="200">{$L.3035}</th>
+					<th width="100">{$L.1113}</th>
+					<th width="200">{$L.1106}</th>
+				</tr>
+				{foreach $list as $v}
+				<tr>
+					<td>{$v.email}</td>
+					<td>{$v.uname}</td>
+					<td>{$v.tel}</td>
+					<td>{byteFormat($v.bytes,'GB')}</td>
+					<td>
+						{if $v.active==1}{$L.1111}{else}<font color="#FF0000">{$L.1110}</font>{/if}
+					</td>
+					
+					<td>
+					
+					<a class="button border-blue button-little" href="{U('Users/edit',"id={$v.id}")}">{$L.1103}</a> 
+					<a class="button border-yellow button-little" href="#" onclick="return delOne('{U('Users',"id={$v.id}")}')">{$L.1104}</a>
+					
+					</td>
+				</tr>
+				{/foreach}
+				
+				
+			</table>
+			<div class="page">{$page}</div>
+			
+		</div>
+	</form>
+</div>
+<script>
+	$(function(){
+		$(".rec").click(function(){
+			var ii = layer.load();
+			var url = $(this).attr('href');
+			$.get(url,function(html){
+				var html = read(html)
+				layer.close(ii);
+				layer.open({
+				  id:"_ajax_rec",
+				  type:1,
+				  area: ['800px'],
+				  title:$L[1013],
+				  content: html
+				  
+				});
+			})
+			return false;
+		});
+		$("#active").val('{$smarty.get.active}');
+		$("#sort").val('{$smarty.get.sort}');
+	})
+</script>
+{include file="$HOME/footer.html"}

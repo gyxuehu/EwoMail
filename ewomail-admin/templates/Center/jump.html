@@ -1,0 +1,15 @@
+{include file="$HOME/header.html"}
+<div class="admin">
+	<div class="admin_title"><span>{$L.2033}</span></div>
+	<div style="padding:5px; font-size:14px; text-align:center">
+	{$msg}
+	<br />
+	{if $url}
+		<a href="{$url}">{$L.2034}</a>
+	{else}
+		<a href="javascript:history.back(-1);">{$L.2034}</a>
+	{/if}
+	
+	</div>
+</div>
+{include file="$HOME/footer.html"}

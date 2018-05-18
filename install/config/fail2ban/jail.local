@@ -1,0 +1,32 @@
+#
+# Community: http://ewomail.com
+#
+[ssh]
+enabled     = true
+filter      = sshd
+action      = iptables[name=ssh, port="ssh", protocol=tcp]
+logpath     = /var/log/secure
+maxretry    = 5
+bantime     = 36000
+findtime  	= 3600
+ignoreip    = 127.0.0.1 127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+
+[dovecot]
+enabled     = true
+filter      = dovecot
+action      = iptables-multiport[name=dovecot, port="smtp,pop3,pop3s,imap,imaps", protocol=tcp]
+logpath     = /var/log/dovecot.log
+maxretry    = 5
+bantime     = 3600
+findtime  	= 3600
+ignoreip    = 127.0.0.1 127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+
+[postfix]
+enabled     = true
+filter      = postfix.ewomail
+action      = iptables-multiport[name=postfix, port="http,https,smtp,submission,pop3,pop3s,imap,imaps,sieve", protocol=tcp]
+logpath     = /var/log/maillog
+maxretry    = 5
+bantime     = 36000
+findtime  	= 3600
+ignoreip    = 127.0.0.1 127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16

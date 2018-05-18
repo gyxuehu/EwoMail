@@ -1,0 +1,5 @@
+#CLAMD_CONFIGFILE=/etc/clamd.d/<SERVICE>.conf
+#CLAMD_SOCKET=/var/run/clamd.<SERVICE>/clamd.sock
+#CLAMD_OPTIONS=
+CLAMD_CONFIGFILE=/etc/clamd.d/amavisd.conf
+CLAMD_SOCKET=/var/run/clamd.amavisd/clamd.sock

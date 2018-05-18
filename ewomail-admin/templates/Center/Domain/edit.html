@@ -1,0 +1,59 @@
+{include file="$HOME/header.html"}
+<div class="admin">
+	
+	<form method="post" class="form-x" action="" id="myform">
+
+		<div class="form-group">
+			<div class="label">
+				<label for="readme">{$L.90103}</label>
+			</div>
+			<div class="field">
+				<input type="text" class="input" name="name" size="50" value="{$row.name}" {if $row} disabled="disabled" {/if} placeholder="test.com" data-validate="required:{$L.1107}{$L.90103}" />
+			</div>
+		</div>
+		
+		
+		
+		<div class="form-group">
+			<div class="label">
+				<label>{$L.1113}</label>
+			</div>
+			<div class="field">
+				<div class="button-group button-group-small radio">
+					<label class="button active">
+						<input name="active" value="1" checked="checked" type="radio"><span class="icon icon-check"></span>{$L.1111}</label>
+					<label class="button">
+						<input name="active" value="0" type="radio"><span class="icon icon-check"></span>{$L.1110}</label>
+				</div>
+			</div>
+		</div>
+		
+		<div class="form-button">
+			<input type="hidden" name="_method" value="put" />
+			<input type="hidden" name="_forward" value="{asForward($row,'Domain')}" />
+			<button class="button bg-main" type="submit" id="mysubmit">{$L.1108}</button>
+		</div>
+	</form>
+	<script>
+		$(function(){
+			
+			//提交数据
+			$("#mysubmit").click(function(){
+				$("#myform").putData();
+				return false;
+			})
+			
+			var active = '{$row.active}';
+			if(active=='') active = '1';
+			
+			var webmail = '{$row.webmail}';
+			if(webmail=='') webmail = '1';
+			
+			$("input[name='active'][value='"+active+"']").trigger("change").trigger("click");
+			$("input[name='webmail'][value='"+webmail+"']").trigger("change").trigger("click");
+
+		})
+		
+	</script>
+</div>
+{include file="$HOME/footer.html"}
