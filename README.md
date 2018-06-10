@@ -100,3 +100,6 @@ EwoMail-Admin集成了前端框架、后台敏捷开发框架，利用这些框�
 ### webmail
 
 ![webmail](https://box.kancloud.cn/3de1da2809f14048fb4cb3b32d0408d1_1183x476.png "webmail")
+
+### 安装或使用过程遇到问题
+http://www.ewomail.com/show-19-70-1.html
