@@ -41,6 +41,7 @@ amavis_install(){
         cp -rf $cur_dir/config/clamav/clamd.amavisd /etc/sysconfig
         cp -rf $cur_dir/config/clamav/clamd.amavisd.conf /etc/tmpfiles.d
         cp -rf $cur_dir/config/clamav/clamd@.service /usr/lib/systemd/system
+        freshclam
     else
         yum -y install amavisd-new
         chmod -R 770 /var/spool/amavisd/tmp
@@ -146,7 +147,7 @@ init(){
     epel_install
     yum -y install postfix perl-DBI perl-JSON-XS perl-NetAddr-IP perl-Mail-SPF perl-Sys-Hostname-Long freetype* libpng* libjpeg* iptables fail2ban
     
-    if [ $df = "-f" ] ; then 
+    if [[ $df = "-f" ]] ; then 
         rpm -ivh $cur_dir/soft/ewomail-lamp-1.0-el6.x86_64.rpm --force --nodeps
     else
         rpm -ivh $cur_dir/soft/ewomail-lamp-1.0-el6.x86_64.rpm
