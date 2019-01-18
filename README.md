@@ -1,3 +1,11 @@
+### 2018-8-20更新说明
+更新centos7.5与redhat 脚本问题
+
+### 2018-8-10更新说明
+
+centos7 安装兼容更新，之前下载安装包的朋友请重新下载，已安装的不需改动。
+
+
 ### 1.05更新内容 
 
 
@@ -102,4 +110,5 @@ EwoMail-Admin集成了前端框架、后台敏捷开发框架，利用这些框�
 ![webmail](https://box.kancloud.cn/3de1da2809f14048fb4cb3b32d0408d1_1183x476.png "webmail")
 
 ### 安装或使用过程遇到问题
+
 http://www.ewomail.com/show-19-70-1.html

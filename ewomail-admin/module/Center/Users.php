@@ -97,7 +97,7 @@ Rout::get('edit',function(){
 
 //邮件编辑数据保存
 Rout::put('edit',function(){
-    Admin::setMenu(103);
+    Admin::setMenu(101);
     $id = intval(iget('id'));
     $users = new User();
     $users->save([],$id);
