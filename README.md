@@ -49,7 +49,7 @@ Rainloop：webmail
 
 ### 安装环境
 
-centos6/7系统，服务器需要干净环境，最好是全新安装的系统。
+centos6/7 64位系统，服务器需要干净环境，最好是全新安装的系统。
 
 最低配置要求
 
@@ -63,7 +63,7 @@ CPU：1核
 
 安装前需要swap缓存，请务必先检查swap是否已经启动。
 
-### 手动安装
+### 手动安装（centos6）
 
 下载并重新命名为ewomail.zip
 
@@ -75,6 +75,18 @@ cd EwoMail/install
 #需要输入一个邮箱域名，不需要前缀，列如下面的ewomail.cn
 sh ./start.sh ewomail.cn
 ```
+
+### centos7
+
+```
+yum -y install git
+cd /root
+git clone https://github.com/gyxuehu/EwoMail.git
+cd /root/EwoMail/install
+#需要输入一个邮箱域名，不需要前缀，列如下面的ewomail.cn
+sh ./start.sh ewomail.cn
+```
+
 
 ### 文档教程
 
