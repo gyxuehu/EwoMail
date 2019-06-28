@@ -21,6 +21,7 @@ class User extends App
      */
     public function getOne($id)
     {
+        $id = intval($id);
         $data = App::$db->getOne("select * from ".table('users')." where id=".$id);
         if(!$data){
             E::error(1005);

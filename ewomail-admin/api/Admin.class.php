@@ -27,6 +27,7 @@ class Admin extends App
      */
     public function getOne($id)
     {
+        $id = intval($id);
         $data = App::$db->getOne("select * from ".table('admin')." where aid=".$id);
         if(!$data){
             E::error(1005);
