@@ -32,7 +32,7 @@ Rout::get('index',function(){
 //角色删除
 Rout::delete('index',function(){
     Admin::setMenu(203);
-    $gid = iget('gid');
+    $gid = intval(iget('gid'));
     $row = App::$db->getOne("select * from ".table("admin_group")." where gid=$gid");
     $where = "gid=$gid";
     App::$db->delete("admin_group",$where);
