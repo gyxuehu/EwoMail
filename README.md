@@ -113,7 +113,7 @@ EwoMail-Admin集成了前端框架、后台敏捷开发框架，利用这些框�
 3、邮箱域名管理
 4、多语言
 
-[EwoMail-Admin开发教程](http://doc.ewomail.com/ewomail-admin)
+### 邮箱后台
 
 ![ewomail-admin](https://box.kancloud.cn/c362878ba731559b09eae36b7236bde5_1366x609.png "ewomail-admin")
 
