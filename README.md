@@ -1,47 +1,25 @@
-### 2018-8-20更新说明
-更新centos7.5与redhat 脚本问题
+### 1.06更新说明
 
-### 2018-8-10更新说明
+更新了部分组件，优化了安装方式，优化了内存占用，小内存运行更快更稳定。
 
-centos7 安装兼容更新，之前下载安装包的朋友请重新下载，已安装的不需改动。
+将使用nginx作为默认web组件，删除了webmail的默认固定logo
 
+更多配置和详细信息请参考文档
 
-### 1.05更新内容 
-
-
-1、兼容centos7
-
-    将部分主要的组件重新打包，测试，并且兼容centos6和centos7。
-
-2、新加nginx
-
-    默认绑定80端口，需手动启动。
-
-3、新加php-fpm
-
-    可以利用nginx配置php-fpm或apache，php-fpm默认端口9000，需手动启动。
-
-4、apache
-    
-    取消apache绑定的80端口，邮箱管理后台与webmail保留端口，保持原来的apache运行。
-
-### EwoMail开源邮件服务器软件  
-
+### EwoMail
 
 EwoMail是基于Linux的开源邮件服务器软件，集成了众多优秀稳定的组件，是一个快速部署、简单高效、多语言、安全稳定的邮件解决方案，帮助你提升运维效率，降低 IT 成本，兼容主流的邮件客户端，同时支持电脑和手机邮件客户端。
 
 ### 集成组件
 
 
-Postfix：邮件服务器
+Postfix：邮件服务器SMTP
 
 Dovecot：IMAP/POP3/邮件存储
 
 Amavisd：反垃圾和反病毒
 
-fail2ban：监控策略
-
-LNAMP：apache2.2，nginx1.8，mysql5.5，php5.4
+LNAMP：，nginx，mysql，php
 
 EwoMail-Admin：WEB邮箱管理后台
 
@@ -49,7 +27,7 @@ Rainloop：webmail
 
 ### 安装环境
 
-centos6/7 64位系统，服务器需要干净环境，最好是全新安装的系统。
+centos6/7系统，服务器需要干净环境，全新安装的系统。
 
 最低配置要求
 
@@ -90,37 +68,21 @@ sh ./start.sh ewomail.cn
 
 ### 文档教程
 
-在线安装、配置等等的更多详细教程请查看
+安装和文档教程
 
-[EwoMail在线文档](http://doc.ewomail.com/ewomail)
+http://doc.ewomail.com/docs/ewomail/install
 
-### EwoMail-Admin
 
-EwoMail-Admin是一个多语言邮箱管理后台，用PHP语言开发，开源免费。
-
-自主原生开发，没有采用第三方框架，简单高效、易二次开发。
-
-需要搭配EwoMail邮件服务器软件使用。
-
-环境要求：PHP5.4+，MYSQL5.5+
-
-EwoMail-Admin集成了前端框架、后台敏捷开发框架，利用这些框架可以很容易的进行二次开发，定制化功能来满足你的邮件服务器更多需求。
-
- **主要功能** 
-
-1、权限管理（管理员权限分配）
-2、邮箱管理
-3、邮箱域名管理
-4、多语言
 
 ### 邮箱后台
 
-![ewomail-admin](https://box.kancloud.cn/c362878ba731559b09eae36b7236bde5_1366x609.png "ewomail-admin")
+![ewomail-admin](https://images.gitee.com/uploads/images/2019/1231/142334_74d987df_325053.png "ewomail-admin")
 
 ### webmail
 
-![webmail](https://box.kancloud.cn/3de1da2809f14048fb4cb3b32d0408d1_1183x476.png "webmail")
+![webmail](https://images.gitee.com/uploads/images/2019/1231/142334_6daf7a2a_325053.png "webmail")
 
 ### 安装或使用过程遇到问题
 
 http://www.ewomail.com/show-19-70-1.html
+
