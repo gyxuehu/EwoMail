@@ -17,15 +17,17 @@ setenforce 0
 
 centos7=false
 
+
+
 if [ -f "/usr/lib/systemd/system/network.target" ]; then
     centos7=true
 fi
 
 dovecot_install(){
     if [ $centos7 = true ] ; then 
-        rpm -ivh $cur_dir/soft/centos7-dovecot-2.2.24-el6.x86_64.rpm
+        rpm -ivh $cur_dir/soft/centos7-dovecot-2.2.33.2-el6.x86_64.rpm
     else
-        rpm -ivh $cur_dir/soft/dovecot-2.2.24-el6.x86_64.rpm
+        rpm -ivh $cur_dir/soft/dovecot-2.2.33.2-el6.x86_64.rpm
     fi
     
 }
@@ -72,20 +74,15 @@ config_file(){
         chmod -R 755 /etc/rc.d/init.d/dovecot
     fi
     
-    cp -rf $cur_dir/soft/httpd.conf /ewomail/apache/conf
     
     cp -rf $cur_dir/config/dovecot /etc
     cp -rf $cur_dir/config/postfix /etc
     
-    mv /etc/sysconfig/iptables /etc/sysconfig/iptables.backup
-    cp -rf $cur_dir/soft/iptables /etc/sysconfig/iptables
-    chmod -R 600 /etc/sysconfig/iptables
-    
     mkdir -p /etc/ssl/certs
     mkdir -p /etc/ssl/private
     
-    cp -rf $cur_dir/soft/httpd.init /etc/rc.d/init.d/httpd
-    chmod -R 755 /etc/rc.d/init.d/httpd
+    cp -rf $cur_dir/config/nginx/* /ewomail/nginx/conf/
+    cp -rf $cur_dir/soft/php-fpm.conf /ewomail/php54/etc
     
     cp -rf $cur_dir/soft/nginx.init /etc/rc.d/init.d/nginx
     chmod -R 755 /etc/rc.d/init.d/nginx
@@ -99,7 +96,9 @@ config_file(){
     cp -rf $cur_dir/config/fail2ban/jail.local /etc/fail2ban
     cp -rf $cur_dir/config/fail2ban/postfix.ewomail.conf /etc/fail2ban/filter.d
     
+    cp -rf $cur_dir/soft/dovecot-openssl.cnf /usr/local/dovecot/share/doc/dovecot/dovecot-openssl.cnf
     cd /usr/local/dovecot/share/doc/dovecot
+    sed -i "s/ewomail.cn/$domain/g" dovecot-openssl.cnf
     sh mkcert.sh
 }
 
@@ -143,14 +142,23 @@ init(){
         exit 1
     fi
     
+    if rpm -qa | grep dovecot > /dev/null;then
+        echo "installation failed,dovecot is installed"
+        exit 1
+    fi
+    
     yum remove sendmail
     epel_install
     yum -y install postfix perl-DBI perl-JSON-XS perl-NetAddr-IP perl-Mail-SPF perl-Sys-Hostname-Long freetype* libpng* libjpeg* iptables fail2ban
     
-    if [[ $df = "-f" ]] ; then 
-        rpm -ivh $cur_dir/soft/ewomail-lamp-1.0-el6.x86_64.rpm --force --nodeps
+    if [ ! -f "/usr/lib64/libmcrypt.so.4" ]; then
+        rpm -ivh $cur_dir/soft/libmcrypt-2.5.7-1.2.el6.rf.x86_64.rpm
+    fi
+    
+    if [ $df = "-f" ] ; then 
+        rpm -ivh $cur_dir/soft/ewomail-lamp-1.3-el6.x86_64.rpm --force --nodeps
     else
-        rpm -ivh $cur_dir/soft/ewomail-lamp-1.0-el6.x86_64.rpm
+        rpm -ivh $cur_dir/soft/ewomail-lamp-1.3-el6.x86_64.rpm
     fi
 
     
@@ -179,8 +187,12 @@ init(){
     chown -R vmail:vmail /ewomail/mail
     chmod -R 700 /ewomail/mail
     
-    chown -R www:www /ewomail/www
     chmod -R 770 /ewomail/www
+    mkdir -p /ewomail/www/session/ewomail-admin
+    mkdir -p /ewomail/www/session/webmail
+    mkdir -p /ewomail/www/session/phpmyadmin
+    chown -R www:www /ewomail/www
+    
     
     mkdir -p /ewomail/dkim
     chown -R amavis:amavis /ewomail/dkim
@@ -195,16 +207,29 @@ init(){
     
     chmod -R 440 /ewomail/config.ini
     
-    rm -rf /ewomail/www/tz.php
     
+    iptables -I INPUT -p tcp --dport 8000 -j ACCEPT
+    iptables -I INPUT -p tcp --dport 8010 -j ACCEPT
+    iptables -I INPUT -p tcp --dport 8020 -j ACCEPT
+    iptables -I INPUT -p tcp --dport 993 -j ACCEPT
+    iptables -I INPUT -p tcp --dport 995 -j ACCEPT
+    iptables -I INPUT -p tcp --dport 587 -j ACCEPT
+    iptables -I INPUT -p tcp --dport 465 -j ACCEPT
+    iptables -I INPUT -p tcp --dport 143 -j ACCEPT
+    iptables -I INPUT -p tcp --dport 110 -j ACCEPT
+    iptables -I INPUT -p tcp --dport 109 -j ACCEPT
+    iptables -I INPUT -p tcp --dport 25 -j ACCEPT
+    iptables -I INPUT -p tcp --dport 22 -j ACCEPT
+    service iptables save
     
     if [ $centos7 = true ] ; then 
         chkconfig mysqld on
-        chkconfig httpd on
+        chkconfig nginx on
+        chkconfig php-fpm on
         systemctl enable postfix dovecot amavisd spamassassin fail2ban clamd@amavisd iptables
         
-        
-        service httpd start
+        service php-fpm start
+        service nginx start
         systemctl restart amavisd spamassassin clamd@amavisd
         systemctl restart postfix dovecot fail2ban
         
@@ -219,7 +244,8 @@ init(){
         chkconfig amavisd on
         chkconfig postfix on
         chkconfig dovecot on
-        chkconfig httpd on
+        chkconfig nginx on
+        chkconfig php-fpm on
         chkconfig fail2ban on
         
         service iptables restart
@@ -227,7 +253,8 @@ init(){
         service spamassassin start
         service amavisd start
         service dovecot start
-        service httpd start
+        service php-fpm start
+        service nginx start
         service postfix restart
         service fail2ban start
     fi

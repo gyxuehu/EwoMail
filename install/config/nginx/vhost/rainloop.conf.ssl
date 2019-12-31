@@ -1,0 +1,28 @@
+server {
+	server_name localhost;
+	listen 8000 ssl;
+	index index.php index.html index.htm;
+	root /ewomail/www/rainloop;
+    
+    location ^~ /data {
+      deny all;
+    }
+    
+    ssl_certificate /etc/ssl/certs/dovecot.pem;
+    ssl_certificate_key /etc/ssl/private/dovecot.pem;
+    ssl_session_timeout 5m;
+    ssl_protocols  TLSv1.2 TLSv1 SSLv2 SSLv3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers  HIGH:!aNULL:!MD5;
+    
+    location ~ \.php{
+            
+            fastcgi_pass   127.0.0.1:9005;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+			fastcgi_param  PHP_VALUE        open_basedir=/ewomail/www/:/tmp/:/proc/;
+            fastcgi_param  PHP_VALUE        session.save_path=/ewomail/www/session/webmail;
+            include        fastcgi_params;
+            
+    }
+}

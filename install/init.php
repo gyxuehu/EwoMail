@@ -231,54 +231,6 @@ dkim_key("'.$this->domain.'", "dkim", "/ewomail/dkim/mail.pem");
             return $c;
         });
         
-        //apache
-        $apache_conf = '/ewomail/apache/conf/extra/httpd-vhosts.conf';
-        $apache_str = "
-Listen 8000 
-Listen 8010
-Listen 8020
-
-<VirtualHost *:8010>
-ServerName localhost
-DocumentRoot /ewomail/www/ewomail-admin/
-DirectoryIndex index.php index.html index.htm
-<Directory /ewomail/www/ewomail-admin/>
-Options +Includes -Indexes
-AllowOverride All
-Order Deny,Allow
-Allow from All
-</Directory>
-</VirtualHost>
-
-<VirtualHost *:8000>
-ServerName localhost
-DocumentRoot /ewomail/www/rainloop/
-DirectoryIndex index.php index.html index.htm
-<Directory /ewomail/www/rainloop/>
-Options +Includes -Indexes
-AllowOverride All
-Order Deny,Allow
-Allow from All
-</Directory>
-</VirtualHost>
-
-<VirtualHost *:8020>
-ServerName localhost
-DocumentRoot /ewomail/www/phpMyAdmin/
-DirectoryIndex index.php index.html index.htm
-<Directory /ewomail/www/phpMyAdmin/>
-Options +Includes -Indexes
-AllowOverride All
-Order Deny,Allow
-Allow from All
-</Directory>
-</VirtualHost>
-        ";
-        
-        if(copy($apache_conf,$apache_conf.".backup")){
-            file_put_contents($apache_conf,$apache_str);
-        }
-        
     }
     
     public function op_file($file,$fun)
