@@ -149,7 +149,7 @@ init(){
     
     yum remove sendmail
     epel_install
-    yum -y install postfix perl-DBI perl-JSON-XS perl-NetAddr-IP perl-Mail-SPF perl-Sys-Hostname-Long freetype* libpng* libjpeg* iptables fail2ban
+    yum -y install postfix perl-DBI perl-JSON-XS perl-NetAddr-IP perl-Mail-SPF perl-Sys-Hostname-Long libtool-ltdl freetype* libpng* libjpeg* iptables fail2ban
     
     if [ ! -f "/usr/lib64/libmcrypt.so.4" ]; then
         rpm -ivh $cur_dir/soft/libmcrypt-2.5.7-1.2.el6.rf.x86_64.rpm
