@@ -1,8 +1,12 @@
-#! /bin/bash
+#!/bin/bash
+# nginx Startup script for the Nginx HTTP Server
+# it is v.0.0.2 version.
 # chkconfig: 2345 55 25
-# Description: Startup script for nginx webserver on Debian. Place in /etc/init.d and
-# run 'update-rc.d -f nginx defaults', or use the appropriate command on your
-# distro. For CentOS/Redhat run: 'chkconfig --add nginx'
+# description: Nginx is a high-performance web and proxy server.
+#              It has a lot of features, but it's not for everyone.
+# processname: nginx
+# pidfile: /ewomail/nginx/logs/nginx.pid
+# config: /ewomail/nginx/conf/nginx.conf
 
 ### BEGIN INIT INFO
 # Provides:          nginx
@@ -14,81 +18,68 @@
 # Description:       starts nginx using start-stop-daemon
 ### END INIT INFO
 
-# Author:   ezhttp
-# website:  http://lnmp.org
-
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DESC="nginx daemon"
-nginx_location=/ewomail/nginx
-DAEMON=$nginx_location/sbin/nginx
-CONFIGFILE=$nginx_location/conf/nginx.conf
-PIDFILE=$nginx_location/logs/nginx.pid
-SCRIPTNAME=/etc/init.d/nginx
-
-set -e
-[ -x "$DAEMON" ] || exit 0
-
-acqNginxPid(){
-  local pid
-  if [ -f $PIDFILE ] ; then
-  	 pid=`cat $PIDFILE`
-  	 echo ${pid}
-  fi 	 
+nginxd=/ewomail/nginx/sbin/nginx
+nginx_config=/ewomail/nginx/conf/nginx.conf
+nginx_pid=/ewomail/nginx/logs/nginx.pid
+RETVAL=0
+prog="nginx"
+# Source function library.
+. /etc/rc.d/init.d/functions
+# Source networking configuration.
+. /etc/sysconfig/network
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 0
+[ -x $nginxd ] || exit 0
+# Start nginx daemons functions.
+start() {
+if [ -e $nginx_pid ];then
+   echo "nginx already running...."
+   exit 1
+fi
+   echo -n $"Starting $prog: "
+   daemon $nginxd -c ${nginx_config}
+   RETVAL=$?
+   echo
+   [ $RETVAL = 0 ] && touch /var/lock/subsys/nginx
+   return $RETVAL
 }
-
-do_start() {
- local pid=`acqNginxPid`
- if [[ ".${pid}" == "." ]] ; then
-    $DAEMON -c $CONFIGFILE 
- else
-    echo -n "nginx already running"
- fi
+# Stop nginx daemons functions.
+stop() {
+        echo -n $"Stopping $prog: "
+        killproc $nginxd
+        RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] && rm -f /var/lock/subsys/nginx /ewomail/nginx/logs/nginx.pid
 }
-
-do_stop() {
- local pid=`acqNginxPid`
- if [ ".${pid}" != "." ] ; then
-    kill -INT ${pid}
- else
-    echo -n "nginx not running"
- fi
+# reload nginx service functions.
+reload() {
+    echo -n $"Reloading $prog: "
+    #kill -HUP `cat ${nginx_pid}`
+    killproc $nginxd -HUP
+    RETVAL=$?
+    echo
 }
-
-do_reload() {
- local pid=`acqNginxPid`
- if [ ".${pid}" != "." ] ; then
-    kill -HUP ${pid}
- else
-    echo -n "nginx can't reload"
- fi
-}
-
+# See how we were called.
 case "$1" in
- start)
- echo -n "Starting $DESC: $NAME"
- do_start
- echo "."
- ;;
- stop)
- echo -n "Stopping $DESC: $NAME"
- do_stop
- echo "."
- ;;
- reload|graceful)
- echo -n "Reloading $DESC configuration..."
- do_reload
- echo "."
- ;;
- restart)
- echo -n "Restarting $DESC: $NAME"
- do_stop
- do_start
- echo "."
- ;;
- *)
- echo "Usage: $SCRIPTNAME {start|stop|reload|restart}" >&2
- exit 3
- ;;
+start)
+        start
+        ;;
+stop)
+        stop
+        ;;
+reload)
+        reload
+        ;;
+restart)
+        stop
+        start
+        ;;
+status)
+        status $prog
+        RETVAL=$?
+        ;;
+*)
+        echo $"Usage: $prog {start|stop|restart|reload|status|help}"
+        exit 1
 esac
-
-exit 0
+exit $RETVAL
