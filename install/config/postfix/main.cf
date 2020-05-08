@@ -699,6 +699,11 @@ smtp_use_tls = yes
 smtpd_use_tls = yes
 smtp_tls_note_starttls_offer = yes
 
+smtpd_tls_mandatory_protocols = TLSv1.1,TLSv1.2
+smtpd_tls_protocols = TLSv1.1,TLSv1.2
+smtpd_tls_mandatory_ciphers = medium
+tls_medium_cipherlist = AES128+EECDH:AES128+EDH
+
 smtpd_tls_security_level = may
 smtpd_tls_loglevel = 0
 smtpd_tls_session_cache_timeout = 3600s
