@@ -43,7 +43,6 @@ amavis_install(){
         cp -rf $cur_dir/config/clamav/clamd.amavisd /etc/sysconfig
         cp -rf $cur_dir/config/clamav/clamd.amavisd.conf /etc/tmpfiles.d
         cp -rf $cur_dir/config/clamav/clamd@.service /usr/lib/systemd/system
-        freshclam
     else
         yum -y install amavisd-new
         chmod -R 770 /var/spool/amavisd/tmp
@@ -57,7 +56,8 @@ amavis_install(){
 
 epel_install(){
     if [ $centos7 = true ] ; then 
-        rpm -ivh $cur_dir/soft/epel-release-latest-7.noarch.rpm
+        #rpm -ivh $cur_dir/soft/epel-release-latest-7.noarch.rpm
+        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm        
     else
         cp -f $cur_dir/soft/epel-6.repo /etc/yum.repos.d/epel-6.repo
     fi
@@ -230,12 +230,14 @@ init(){
         
         service php-fpm start
         service nginx start
-        systemctl restart amavisd spamassassin clamd@amavisd
+        systemctl restart spamassassin
         systemctl restart postfix dovecot fail2ban
         
         systemctl mask firewalld.service
         systemctl stop firewalld.service
         systemctl restart iptables
+        freshclam
+        systemctl restart amavisd clamd@amavisd
         
     else
         chkconfig mysqld on
