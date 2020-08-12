@@ -341,8 +341,8 @@ class Admin extends App
             if($data['num']>=5){
                 $cur_time = time();
                 $date = new Date();
-                $dtime = $date->parse($data['time'])-3600;
-                if($dtime<$cur_time){
+                $dtime = $date->parse($data['time'])+3600;
+                if($dtime>$cur_time){
                     $logData = [
                         'ac'=>'login',
                         'c'=>'登录失败次数超过5次，禁止该IP一个小时内登录该账号：'.$username
