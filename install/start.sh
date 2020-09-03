@@ -118,7 +118,7 @@ check_install(){
         exit 1
     fi
     
-    if ! rpm -qa | grep amavisd-new > /dev/null;then
+    if ! rpm -qa | grep amavis > /dev/null;then
         echo "amavisd Installation failed"
         exit 1
     fi
