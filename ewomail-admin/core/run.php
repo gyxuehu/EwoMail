@@ -16,7 +16,7 @@ if(!defined("PATH")) exit;
 error_reporting(E_ALL & ~E_NOTICE);
 header("Content-type: text/html; charset=utf-8");
 include PATH.'/core/functions.php';
-include PATH.'/lib/smarty-3.1.24/libs/Smarty.class.php';
+include PATH.'/lib/smarty-3.1.35/libs/Smarty.class.php';
 
 //注册类
 spl_autoload_register(function($class_name){

@@ -10,69 +10,86 @@
 #!/bin/bash
 cur_dir=`pwd`
 domain=$1
-df=$2
-set -o pipefail
-stty erase ^h
+en=$2
+#set -o pipefail
+#stty erase ^h
 setenforce 0
 
-centos7=false
+centosV=`cat /etc/redhat-release|sed -r 's/.* ([0-9]+)\..*/\1/'`
 
-
-
-if [ -f "/usr/lib/systemd/system/network.target" ]; then
-    centos7=true
+if [ $centosV != 7 ] ; then 
+    if [ $centosV != 8 ] ; then 
+        echo "unsigned version"
+        exit
+    fi
 fi
 
+
 dovecot_install(){
-    if [ $centos7 = true ] ; then 
-        rpm -ivh $cur_dir/soft/centos7-dovecot-2.2.33.2-el6.x86_64.rpm
+    if [ $centosV = 7 ] ; then 
+        rpm -ivh $cur_dir/soft/dovecot-2.3.11.3-el7.x86_64.rpm
     else
-        rpm -ivh $cur_dir/soft/dovecot-2.2.33.2-el6.x86_64.rpm
+        rpm -ivh $cur_dir/soft/dovecot-2.3.11.3-el8.x86_64.rpm
     fi
     
+    if ! rpm -qa | grep dovecot > /dev/null;then
+        echo "dovecot Installation failed"
+        exit 1
+    fi
 }
 
-spf_install(){
-    cp -f $cur_dir/soft/postfix-policyd-spf-perl /usr/libexec/postfix/
-    chmod -R 755 /usr/libexec/postfix/postfix-policyd-spf-perl
-}
+
 
 amavis_install(){
-    if [ $centos7 = true ] ; then 
-        yum -y install amavisd-new clamav-server clamav-server-systemd iptables-services
-        cp -rf $cur_dir/config/clamav/clamd.amavisd /etc/sysconfig
-        cp -rf $cur_dir/config/clamav/clamd.amavisd.conf /etc/tmpfiles.d
-        cp -rf $cur_dir/config/clamav/clamd@.service /usr/lib/systemd/system
-    else
-        yum -y install amavisd-new
-        chmod -R 770 /var/spool/amavisd/tmp
-        usermod -G amavis clam
-        ln -s /etc/amavisd/amavisd.conf /etc
-        mv /etc/clamd.conf /etc/clamd.conf.backup
-        cp -rf /etc/clamd.d/amavisd.conf /etc/clamd.conf
+    yum -y install amavisd-new clamav-server clamav-server-systemd
+    
+    if ! rpm -qa | grep amavis > /dev/null;then
+        echo "amavisd Installation failed"
+        exit 1
     fi
     
 }
 
-epel_install(){
-    if [ $centos7 = true ] ; then 
-        #rpm -ivh $cur_dir/soft/epel-release-latest-7.noarch.rpm
-        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm        
+down_rpm(){
+    cd $cur_dir/soft
+    filename=""
+    md5file=""
+    if [ $centosV = 7 ] ; then 
+        md5file="ebd320c8ca86a3b8c4430e350d14cff8"
+        filename="ewomail-npm-1.09-el7.tar.gz"
     else
-        cp -f $cur_dir/soft/epel-6.repo /etc/yum.repos.d/epel-6.repo
+        md5file="1aa30322e0fe8340655bdf7bbd1506b1"
+        filename="ewomail-npm-1.09-el8.tar.gz"
     fi
+    
+    if [ "$en" != "en" ] ; then 
+        wget -c -t 20 -T 180 --limit-rate=2m http://npm.ewomail.com/$filename
+    else
+        wget -c -t 20 -T 180 --limit-rate=2m http://download.ewomail.org:8282/$filename
+    fi
+    
+    if [ ! -f $filename ]; then
+        echo "${filename} download failed";
+        exit
+    fi
+    
+    testmd5=`md5sum $filename|cut -d ' ' -f1`
+    if [ $testmd5 != $md5file ] ; then 
+        echo "${filename} md5 verification failed";
+        echo "Delete the ${cur_dir}/soft/${filename} file and reinstall EwoMail"
+        echo "rm ${cur_dir}/soft/${filename}"
+        exit
+    fi
+    
+    tar xzvf $filename
+    cd $cur_dir
 }
 
 config_file(){
     
-    if [ $centos7 = true ] ; then 
-        mv /etc/my.cnf /etc/my.cnf.backup
-        ln -s /ewomail/mysql/etc/my.cnf /etc
-        cp -rf $cur_dir/soft/dovecot.service /usr/lib/systemd/system
-    else
-        cp -rf $cur_dir/soft/dovecot.init /etc/rc.d/init.d/dovecot
-        chmod -R 755 /etc/rc.d/init.d/dovecot
-    fi
+    mv /etc/my.cnf /etc/my.cnf.backup
+    ln -s /ewomail/mysql/etc/my.cnf /etc
+    cp -rf $cur_dir/soft/dovecot.service /usr/lib/systemd/system
     
     
     cp -rf $cur_dir/config/dovecot /etc
@@ -82,19 +99,13 @@ config_file(){
     mkdir -p /etc/ssl/private
     
     cp -rf $cur_dir/config/nginx/* /ewomail/nginx/conf/
-    cp -rf $cur_dir/soft/php-fpm.conf /ewomail/php54/etc
+    cp -rf $cur_dir/soft/nginx.service /usr/lib/systemd/system
     
-    cp -rf $cur_dir/soft/nginx.init /etc/rc.d/init.d/nginx
-    chmod -R 755 /etc/rc.d/init.d/nginx
+    cp -rf $cur_dir/soft/php-fpm.conf /ewomail/php72/etc
+    cp -rf $cur_dir/soft/php.ini /ewomail/php72/etc
+    cp -rf $cur_dir/soft/php-cli.ini /ewomail/php72/etc
+    cp -rf $cur_dir/soft/php-fpm.service /usr/lib/systemd/system
     
-    cp -rf $cur_dir/soft/php.ini /ewomail/php54/etc
-    cp -rf $cur_dir/soft/php-cli.ini /ewomail/php54/etc
-    
-    cp -rf $cur_dir/soft/php-fpm.init /etc/rc.d/init.d/php-fpm
-    chmod -R 755 /etc/rc.d/init.d/php-fpm
-    
-    cp -rf $cur_dir/config/fail2ban/jail.local /etc/fail2ban
-    cp -rf $cur_dir/config/fail2ban/postfix.ewomail.conf /etc/fail2ban/filter.d
     
     cp -rf $cur_dir/soft/dovecot-openssl.cnf /usr/local/dovecot/share/doc/dovecot/dovecot-openssl.cnf
     cd /usr/local/dovecot/share/doc/dovecot
@@ -102,39 +113,15 @@ config_file(){
     sh mkcert.sh
 }
 
-check_install(){
-    if ! rpm -qa | grep ewomail > /dev/null;then
-        echo "ewomail Installation failed"
-        exit 1
-    fi
-    
-    if ! rpm -qa | grep postfix > /dev/null;then
-        echo "postfix Installation failed"
-        exit 1
-    fi
-    
-    if ! rpm -qa | grep dovecot > /dev/null;then
-        echo "dovecot Installation failed"
-        exit 1
-    fi
-    
-    if ! rpm -qa | grep amavis > /dev/null;then
-        echo "amavisd Installation failed"
-        exit 1
-    fi
-    
-    if ! rpm -qa | grep clamav > /dev/null;then
-        echo "clamav Installation failed"
-        exit 1
-    fi
-    
-    if ! rpm -qa | grep spamassassin > /dev/null;then
-        echo "spamassassin Installation failed"
-        exit 1
-    fi
-    
+epel_replace()
+{
+    sed -e 's!^metalink=!#metalink=!g' \
+    -e 's!^#baseurl=!baseurl=!g' \
+    -e 's!//download\.fedoraproject\.org/pub!//mirrors.bfsu.edu.cn!g' \
+    -e 's!http://mirrors\.bfsu!https://mirrors.bfsu!g' \
+    -i /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel-testing.repo
+    yum clean packages
 }
-
 
 init(){
     if [ -z $domain ];then
@@ -148,36 +135,52 @@ init(){
     fi
     
     yum remove sendmail
-    epel_install
-    yum -y install postfix perl-DBI perl-JSON-XS perl-NetAddr-IP perl-Mail-SPF perl-Sys-Hostname-Long libtool-ltdl freetype* libpng* libjpeg* iptables fail2ban
+    yum install epel-release
     
-    if [ ! -f "/usr/lib64/libmcrypt.so.4" ]; then
-        rpm -ivh $cur_dir/soft/libmcrypt-2.5.7-1.2.el6.rf.x86_64.rpm
+    if ! rpm -qa | grep epel-release > /dev/null;then
+        echo "epel-release Installation failed"
+        exit 1
     fi
     
-    if [ $df = "-f" ] ; then 
-        rpm -ivh $cur_dir/soft/ewomail-lamp-1.3-el6.x86_64.rpm --force --nodeps
+    if [ "$en" != "en" ] ; then 
+        epel_replace
+    fi
+    
+    if [ $centosV = 8 ] ; then 
+        dnf config-manager --set-enabled PowerTools
+        yum -y install postfix postfix-mysql mariadb-devel
+        
+    fi
+    
+    yum -y install postfix pypolicyd-spf perl-DBI oniguruma-devel libtool-ltdl freetype libpng libjpeg fail2ban unzip wget
+    amavis_install
+    down_rpm
+    
+    if [ $centosV = 7 ] ; then 
+        rpm -ivh $cur_dir/soft/ewomail-lnmp-1.6-el7.x86_64.rpm
     else
-        rpm -ivh $cur_dir/soft/ewomail-lamp-1.3-el6.x86_64.rpm
+        rpm -ivh $cur_dir/soft/ewomail-lnmp-1.6-el8.x86_64.rpm
     fi
-
     
-    if [ $? != 0 ] ; then echo "ewomail-lamp install failed" >&2 ; exit 1 ; fi
+    if ! rpm -qa | grep ewomail > /dev/null;then
+        echo "ewomail-lnmp Installation failed"
+        exit 1
+    fi
+    
+    dovecot_install
     
     mkdir -p /ewomail/www/default
     cp -rf $cur_dir/../ewomail-admin /ewomail/www/
     cp -rf $cur_dir/../rainloop /ewomail/www/
     
     cd /ewomail/www
-    tar zxvf $cur_dir/soft/phpMyAdmin.tar.gz
-    
+    unzip -o $cur_dir/soft/phpMyAdmin-5.0.2-all-languages.zip
+    ln -s /ewomail/www/phpMyAdmin-5.0.2-all-languages /ewomail/www/phpMyAdmin
     cd $cur_dir
     
-    dovecot_install
-    amavis_install
-    spf_install
+    
     config_file
-    check_install
+    
     
     groupadd -g 5000 vmail
     useradd -M -u 5000 -g vmail -s /sbin/nologin vmail
@@ -207,60 +210,32 @@ init(){
     
     chmod -R 440 /ewomail/config.ini
     
+    systemctl start firewalld
+    firewall-cmd --zone=public --add-port=8000/tcp --permanent 
+    firewall-cmd --zone=public --add-port=8010/tcp --permanent 
+    firewall-cmd --zone=public --add-port=8020/tcp --permanent 
+    firewall-cmd --zone=public --add-port=993/tcp --permanent 
+    firewall-cmd --zone=public --add-port=995/tcp --permanent 
+    firewall-cmd --zone=public --add-port=587/tcp --permanent 
+    firewall-cmd --zone=public --add-port=465/tcp --permanent 
+    firewall-cmd --zone=public --add-port=143/tcp --permanent 
+    firewall-cmd --zone=public --add-port=110/tcp --permanent 
+    firewall-cmd --zone=public --add-port=25/tcp --permanent 
+    firewall-cmd --zone=public --add-port=22/tcp --permanent
+    firewall-cmd --zone=public --add-port=80/tcp --permanent 
+    firewall-cmd --zone=public --add-port=443/tcp --permanent 
+    firewall-cmd --reload
     
-    iptables -I INPUT -p tcp --dport 8000 -j ACCEPT
-    iptables -I INPUT -p tcp --dport 8010 -j ACCEPT
-    iptables -I INPUT -p tcp --dport 8020 -j ACCEPT
-    iptables -I INPUT -p tcp --dport 993 -j ACCEPT
-    iptables -I INPUT -p tcp --dport 995 -j ACCEPT
-    iptables -I INPUT -p tcp --dport 587 -j ACCEPT
-    iptables -I INPUT -p tcp --dport 465 -j ACCEPT
-    iptables -I INPUT -p tcp --dport 143 -j ACCEPT
-    iptables -I INPUT -p tcp --dport 110 -j ACCEPT
-    iptables -I INPUT -p tcp --dport 109 -j ACCEPT
-    iptables -I INPUT -p tcp --dport 25 -j ACCEPT
-    iptables -I INPUT -p tcp --dport 22 -j ACCEPT
-    service iptables save
+    systemctl enable postfix dovecot amavisd spamassassin fail2ban php-fpm nginx mysqld
     
-    if [ $centos7 = true ] ; then 
-        chkconfig mysqld on
-        chkconfig nginx on
-        chkconfig php-fpm on
-        systemctl enable postfix dovecot amavisd spamassassin fail2ban clamd@amavisd iptables
-        
-        service php-fpm start
-        service nginx start
-        systemctl restart spamassassin
-        systemctl restart postfix dovecot fail2ban
-        
-        systemctl mask firewalld.service
-        systemctl stop firewalld.service
-        systemctl restart iptables
+    systemctl restart mysqld php-fpm nginx postfix dovecot fail2ban spamassassin
+    
+    if [ $centosV = 7 ] ; then 
         freshclam
-        systemctl restart amavisd clamd@amavisd
-        
-    else
-        chkconfig mysqld on
-        chkconfig clamd on
-        chkconfig spamassassin on
-        chkconfig amavisd on
-        chkconfig postfix on
-        chkconfig dovecot on
-        chkconfig nginx on
-        chkconfig php-fpm on
-        chkconfig fail2ban on
-        
-        service iptables restart
-        service clamd start
-        service spamassassin start
-        service amavisd start
-        service dovecot start
-        service php-fpm start
-        service nginx start
-        service postfix restart
-        service fail2ban start
     fi
-
+    
+    systemctl restart amavisd
+        
     
     echo "Complete installation"
 }

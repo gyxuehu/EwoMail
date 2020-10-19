@@ -1,0 +1,16 @@
+[Unit]
+Description=The NGINX HTTP and reverse proxy server
+After=syslog.target network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/ewomail/nginx/logs/nginx.pid
+ExecStartPre=/ewomail/nginx/sbin/nginx -t
+ExecStart=/ewomail/nginx/sbin/nginx
+ExecReload=/ewomail/nginx/sbin/nginx -s reload
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
