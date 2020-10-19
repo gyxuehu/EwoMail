@@ -72,7 +72,7 @@ mail_owner = postfix
 # from gethostname(). $myhostname is used as a default value for many
 # other configuration parameters.
 #
-myhostname = mail.shopvd.cn
+myhostname = mail.ewomail.com
 #myhostname = virtual.domain.tld
 
 # The mydomain parameter specifies the local internet domain name.
@@ -80,7 +80,7 @@ myhostname = mail.shopvd.cn
 # $mydomain is used as a default value for many other configuration
 # parameters.
 #
-mydomain = shopvd.cn
+mydomain = ewomail.com
 
 # SENDING MAIL
 # 
