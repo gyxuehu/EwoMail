@@ -1,8 +1,8 @@
-### 1.06更新说明
+### 1.09更新说明
 
-更新了部分组件，优化了安装方式，优化了内存占用，小内存运行更快更稳定。
+更新部分组件，兼容centos8，支持centos7/8。
 
-将使用nginx作为默认web组件，删除了webmail的默认固定logo
+该版本不再支持centos6，可以使用1.06版本安装在centos6系统。
 
 更多配置和详细信息请参考文档
 
@@ -41,7 +41,7 @@ CPU：1核
 
 安装前需要swap缓存，请务必先检查swap是否已经启动。
 
-### 手动安装（centos6）
+### 手动安装
 
 下载并重新命名为ewomail.zip
 
@@ -54,7 +54,9 @@ cd EwoMail/install
 sh ./start.sh ewomail.cn
 ```
 
-### centos7
+ **国外网络** 请在安装域名后面加空格加en，例如  sh ./start.sh ewomail.cn en
+
+### centos7/8
 
 ```
 yum -y install git
@@ -64,7 +66,7 @@ cd /root/EwoMail/install
 #需要输入一个邮箱域名，不需要前缀，列如下面的ewomail.cn
 sh ./start.sh ewomail.cn
 ```
-
+ **国外网络** 请在安装域名后面加空格加en，例如  sh ./start.sh ewomail.cn en
 
 ### 文档教程
 
@@ -85,5 +87,5 @@ http://doc.ewomail.com/docs/ewomail/install
 
 ### 安装或使用过程遇到问题
 
-http://www.ewomail.com/show-19-70-1.html
+http://doc.ewomail.com/docs/ewomail/solve
 
