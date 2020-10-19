@@ -82,7 +82,7 @@ class Admin extends App
         $menu = App::$db->select("select * from ".table("admin_menu")." where top_id=0 order by menu_id asc,sort desc");
         foreach($menu as $k=>$v){
             $v['title'] = L($v['lang']);
-            $data = App::$db->select("select * from ".table("admin_menu")." where top_id=$v[menu_id] order by menu_id asc,sort desc");
+            $data = App::$db->select("select * from ".table("admin_menu")." where top_id={$v['menu_id']} order by menu_id asc,sort desc");
             foreach($data as $kk=>$d){
                 //菜单按照权限显示
                 if(!$adminData['super']){
