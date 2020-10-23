@@ -226,7 +226,7 @@ init(){
     firewall-cmd --zone=public --add-port=443/tcp --permanent 
     firewall-cmd --reload
     
-    systemctl enable postfix dovecot amavisd spamassassin fail2ban php-fpm nginx mysqld
+    systemctl enable postfix dovecot amavisd spamassassin fail2ban php-fpm nginx mysqld firewalld
     
     systemctl restart mysqld php-fpm nginx postfix dovecot fail2ban spamassassin
     
