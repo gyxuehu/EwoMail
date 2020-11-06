@@ -63,9 +63,9 @@ down_rpm(){
     fi
     
     if [ "$en" != "en" ] ; then 
-        wget -c -t 20 -T 180 --limit-rate=2m http://npm.ewomail.com/$filename
+        wget -c -t 20 -T 180 http://npm.ewomail.com/$filename
     else
-        wget -c -t 20 -T 180 --limit-rate=2m http://download.ewomail.org:8282/$filename
+        wget -c -t 20 -T 180 http://download.ewomail.org:8282/$filename
     fi
     
     if [ ! -f $filename ]; then
@@ -152,7 +152,7 @@ init(){
         
     fi
     
-    yum -y install postfix pypolicyd-spf perl-DBI oniguruma-devel libtool-ltdl freetype libpng libjpeg fail2ban unzip wget
+    yum -y install postfix pypolicyd-spf perl-DBI oniguruma-devel libtool-ltdl freetype libpng libjpeg fail2ban unzip wget nscd
     amavis_install
     down_rpm
     
@@ -226,9 +226,10 @@ init(){
     firewall-cmd --zone=public --add-port=443/tcp --permanent 
     firewall-cmd --reload
     
-    systemctl enable postfix dovecot amavisd spamassassin fail2ban php-fpm nginx mysqld firewalld
+    systemctl daemon-reload
+    systemctl enable postfix dovecot amavisd spamassassin fail2ban php-fpm nginx mysqld firewalld nscd
     
-    systemctl restart mysqld php-fpm nginx postfix dovecot fail2ban spamassassin
+    systemctl restart mysqld php-fpm nginx postfix dovecot fail2ban spamassassin nscd
     
     if [ $centosV = 7 ] ; then 
         freshclam
