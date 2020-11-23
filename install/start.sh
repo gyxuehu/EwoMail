@@ -106,6 +106,9 @@ config_file(){
     cp -rf $cur_dir/soft/php-cli.ini /ewomail/php72/etc
     cp -rf $cur_dir/soft/php-fpm.service /usr/lib/systemd/system
     
+    cp -rf $cur_dir/config/fail2ban/jail.local /etc/fail2ban
+    cp -rf $cur_dir/config/fail2ban/postfix.ewomail.conf /etc/fail2ban/filter.d
+    
     
     cp -rf $cur_dir/soft/dovecot-openssl.cnf /usr/local/dovecot/share/doc/dovecot/dovecot-openssl.cnf
     cd /usr/local/dovecot/share/doc/dovecot
