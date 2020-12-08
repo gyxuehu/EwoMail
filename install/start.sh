@@ -150,7 +150,10 @@ init(){
     fi
     
     if [ $centosV = 8 ] ; then 
-        dnf config-manager --set-enabled PowerTools
+        dnf config-manager --set-enabled powertools
+        if [ $? -ne 0 ]; then
+            dnf config-manager --set-enabled PowerTools
+        fi
         yum -y install postfix postfix-mysql mariadb-devel
         
     fi
