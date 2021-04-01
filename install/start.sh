@@ -25,6 +25,16 @@ if [ $centosV != 7 ] ; then
 fi
 
 
+if [ -f "/usr/lib/systemd/system/mysqld.service" ]; then
+    echo "not compatible, installation failed"
+    exit
+fi
+
+if [ -f "/etc/rc.d/init.d/mysqld" ]; then
+    echo "not compatible, installation failed"
+    exit
+fi
+
 dovecot_install(){
     if [ $centosV = 7 ] ; then 
         rpm -ivh $cur_dir/soft/dovecot-2.3.11.3-el7.x86_64.rpm
