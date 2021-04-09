@@ -1,8 +1,8 @@
 [DEFAULT]
 ignoreip = 127.0.0.1 127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
 bantime  = 36000
-findtime = 3600
-maxretry = 10
+findtime = 1800
+maxretry = 5
 banaction = firewallcmd-ipset
 action = %(action_mwl)s
 
@@ -13,14 +13,18 @@ filter  = sshd
 port    = 22
 action = %(action_mwl)s
 logpath = /var/log/secure
+maxretry    = 10
+bantime     = 3600
+findtime  	= 3600
 
 [postfix]
 enabled     = true
 filter      = postfix.ewomail
+port    = 25,465,587,143,110
 banaction = firewallcmd-ipset
 action = %(action_mwl)s
 logpath     = /var/log/maillog
 maxretry    = 10
-bantime     = 36000
+bantime     = 3600
 findtime  	= 3600
 ignoreip    = 127.0.0.1 127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
