@@ -26,12 +26,12 @@ fi
 
 
 if [ -f "/usr/lib/systemd/system/mysqld.service" ]; then
-    echo "not compatible, installation failed"
+    echo "mysql installed, installation failed"
     exit
 fi
 
 if [ -f "/etc/rc.d/init.d/mysqld" ]; then
-    echo "not compatible, installation failed"
+    echo "mysql installed, installation failed"
     exit
 fi
 
@@ -118,6 +118,7 @@ config_file(){
     
     cp -rf $cur_dir/config/fail2ban/jail.local /etc/fail2ban
     cp -rf $cur_dir/config/fail2ban/postfix.ewomail.conf /etc/fail2ban/filter.d
+    cp -rf $cur_dir/config/fail2ban/postfix.ewomail.user.conf /etc/fail2ban/filter.d
     
     
     cp -rf $cur_dir/soft/dovecot-openssl.cnf /usr/local/dovecot/share/doc/dovecot/dovecot-openssl.cnf

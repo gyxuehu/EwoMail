@@ -15,7 +15,7 @@ action = %(action_mwl)s
 logpath = /var/log/secure
 maxretry    = 5
 bantime     = 18000
-findtime    = 1800
+findtime  	= 1800
 
 [postfix]
 enabled     = true
@@ -26,5 +26,18 @@ action = %(action_mwl)s
 logpath     = /var/log/maillog
 maxretry    = 10
 bantime     = 7200
+findtime  	= 3600
+ignoreip    = 127.0.0.1 127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+
+
+[postfix.user]
+enabled     = true
+filter      = postfix.ewomail.user
+banaction = firewallcmd-ipset
+action = %(action_mwl)s
+logpath     = /var/log/maillog
+port    = 25
+maxretry    = 30
+bantime     = 3600
 findtime    = 3600
 ignoreip    = 127.0.0.1 127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
