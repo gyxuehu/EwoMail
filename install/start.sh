@@ -13,7 +13,18 @@ domain=$1
 en=$2
 #set -o pipefail
 #stty erase ^h
-setenforce 0
+
+# check root
+if [ "$(id -u)" != "0" ]; then
+    echo
+    echo -e "Error: \033[31mPlease login root user to exec the install script.\033[0m" 1>&2
+    echo
+    exit 0;
+else
+    # Disable SELinux Permanently
+	sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+    setenforce 0
+fi
 
 centosV=`cat /etc/redhat-release|sed -r 's/.* ([0-9]+)\..*/\1/'`
 
@@ -35,9 +46,27 @@ if [ -f "/etc/rc.d/init.d/mysqld" ]; then
     exit
 fi
 
+
+postfix3_install(){
+    pushd $cur_dir/soft/
+    yum install -y \
+        ./postfix3-3.6.1-5.el7.x86_64.rpm \
+        ./postfix3-ldap-3.6.1-5.el7.x86_64.rpm \
+        ./postfix3-mysql-3.6.1-5.el7.x86_64.rpm
+    popd
+}
+
+
 dovecot_install(){
     if [ $centosV = 7 ] ; then 
-        rpm -ivh $cur_dir/soft/dovecot-2.3.11.3-el7.x86_64.rpm
+        cd $cur_dir/soft/
+        yum -y install \
+            ./dovecot-2.3.15-2.el7.x86_64.rpm \
+            ./dovecot-devel-2.3.15-2.el7.x86_64.rpm \
+            ./dovecot-lua-2.3.15-2.el7.x86_64.rpm \
+            ./dovecot-mysql-2.3.15-2.el7.x86_64.rpm \
+            ./dovecot-pgsql-2.3.15-2.el7.x86_64.rpm \
+            ./dovecot-pigeonhole-2.3.15-2.el7.x86_64.rpm
     else
         rpm -ivh $cur_dir/soft/dovecot-2.3.11.3-el8.x86_64.rpm
     fi
@@ -61,46 +90,46 @@ amavis_install(){
 }
 
 down_rpm(){
-    cd $cur_dir/soft
-    filename=""
-    md5file=""
-    if [ $centosV = 7 ] ; then 
-        md5file="ebd320c8ca86a3b8c4430e350d14cff8"
-        filename="ewomail-npm-1.09-el7.tar.gz"
-    else
+    if [ $centosV = 7 ] ; then
+        cd $cur_dir/soft
+        tar xzvf ewomail-npm-1.09-1-el7.tar.gz
+        cd $cur_dir
+    elif [ $centosV = 8 ] ; then
+        cd $cur_dir/soft
         md5file="1aa30322e0fe8340655bdf7bbd1506b1"
         filename="ewomail-npm-1.09-el8.tar.gz"
+
+        if [ "$en" != "en" ];then
+            wget -c -t 20 -T 180 http://npm.ewomail.com/$filename
+        else
+            wget -c -t 20 -T 180 http://download.ewomail.org:8282/$filename
+        fi
+
+        if [ ! -f $filename ]; then
+            echo "${filename} download failed";
+            exit
+        fi
+
+        testmd5=`md5sum $filename|cut -d ' ' -f1`
+        if [ $testmd5 != $md5file ];then
+            echo "${filename} md5 verification failed";
+            echo "Delete the ${cur_dir}/soft/${filename} file and reinstall EwoMail"
+            echo "rm ${cur_dir}/soft/${filename}"
+            exit
+        fi
+
+        tar xzvf $filename
+        cd $cur_dir
     fi
-    
-    if [ "$en" != "en" ] ; then 
-        wget -c -t 20 -T 180 http://npm.ewomail.com/$filename
-    else
-        wget -c -t 20 -T 180 http://download.ewomail.org:8282/$filename
-    fi
-    
-    if [ ! -f $filename ]; then
-        echo "${filename} download failed";
-        exit
-    fi
-    
-    testmd5=`md5sum $filename|cut -d ' ' -f1`
-    if [ $testmd5 != $md5file ] ; then 
-        echo "${filename} md5 verification failed";
-        echo "Delete the ${cur_dir}/soft/${filename} file and reinstall EwoMail"
-        echo "rm ${cur_dir}/soft/${filename}"
-        exit
-    fi
-    
-    tar xzvf $filename
-    cd $cur_dir
 }
 
 config_file(){
     
     mv /etc/my.cnf /etc/my.cnf.backup
     ln -s /ewomail/mysql/etc/my.cnf /etc
-    cp -rf $cur_dir/soft/dovecot.service /usr/lib/systemd/system
-    
+    if [ $centosV = 8 ];then
+        cp -rf $cur_dir/soft/dovecot.service /usr/lib/systemd/system
+    fi
     
     cp -rf $cur_dir/config/dovecot /etc
     cp -rf $cur_dir/config/postfix /etc
@@ -120,11 +149,53 @@ config_file(){
     cp -rf $cur_dir/config/fail2ban/postfix.ewomail.conf /etc/fail2ban/filter.d
     cp -rf $cur_dir/config/fail2ban/postfix.ewomail.user.conf /etc/fail2ban/filter.d
     
-    
-    cp -rf $cur_dir/soft/dovecot-openssl.cnf /usr/local/dovecot/share/doc/dovecot/dovecot-openssl.cnf
-    cd /usr/local/dovecot/share/doc/dovecot
-    sed -i "s/ewomail.cn/$domain/g" dovecot-openssl.cnf
-    sh mkcert.sh
+    if [ $centosV = 8 ];then
+        cp -rf $cur_dir/soft/dovecot-openssl.cnf /usr/local/dovecot/share/doc/dovecot/dovecot-openssl.cnf
+        cd /usr/local/dovecot/share/doc/dovecot
+        sed -i "s/ewomail.cn/$domain/g" dovecot-openssl.cnf
+        sh mkcert.sh
+    else
+        cat > /etc/dovecot/dovecot-openssl.cnf <<EOF
+[ req ]
+default_bits = 4096
+encrypt_key = yes
+distinguished_name = req_dn
+x509_extensions = cert_type
+prompt = no
+
+[ req_dn ]
+# country (2 letter code)
+#C=FI
+
+# State or Province Name (full name)
+#ST=
+
+# Locality Name (eg. city)
+#L=Helsinki
+
+# Organization (eg. company)
+#O=Dovecot
+
+# Organizational Unit Name (eg. section)
+OU=IMAP server
+
+# Common Name (*.example.com is also possible)
+CN=*.$domain
+
+# E-mail contact
+emailAddress=admin$domain
+
+[ cert_type ]
+nsCertType = server
+
+EOF
+        CERTFILE=/etc/ssl/certs/dovecot.pem
+        KEYFILE=/etc/ssl/private/dovecot.pem
+        OPENSSLCONFIG=/etc/dovecot/dovecot-openssl.cnf
+        openssl req -new -x509 -nodes -config $OPENSSLCONFIG -out $CERTFILE -keyout $KEYFILE -days 365
+        chmod 0600 $KEYFILE
+        openssl x509 -subject -fingerprint -noout -in $CERTFILE
+    fi
 }
 
 epel_replace()
@@ -148,8 +219,8 @@ init(){
         exit 1
     fi
     
-    yum remove sendmail
-    yum install epel-release
+    yum remove -y sendmail
+    yum install -y epel-release
     
     if ! rpm -qa | grep epel-release > /dev/null;then
         echo "epel-release Installation failed"
@@ -169,12 +240,22 @@ init(){
         
     fi
     
-    yum -y install postfix pypolicyd-spf perl-DBI oniguruma-devel libtool-ltdl freetype libpng libjpeg fail2ban unzip wget nscd
+    if [ $centosV = 7 ];then
+        yum -y remove postfix
+        yum install -y openssl11-libs
+        postfix3_install
+        yum -y install pypolicyd-spf perl-DBI oniguruma-devel libtool-ltdl freetype libpng libjpeg fail2ban unzip wget nscd
+    else
+        yum -y install postfix pypolicyd-spf perl-DBI oniguruma-devel libtool-ltdl freetype libpng libjpeg fail2ban unzip wget nscd
+    fi
     amavis_install
     down_rpm
     
     if [ $centosV = 7 ] ; then 
-        rpm -ivh $cur_dir/soft/ewomail-lnmp-1.6-el7.x86_64.rpm
+        if [ -d "/ewomail" ];then # If the folder exists, move to ewomail.bak
+            mv /ewomail /ewomail.bak
+        fi
+        rpm -ivh $cur_dir/soft/ewomail-lnmp-1.6-1.el7.x86_64.rpm
     else
         rpm -ivh $cur_dir/soft/ewomail-lnmp-1.6-el8.x86_64.rpm
     fi
