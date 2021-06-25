@@ -127,10 +127,16 @@ config_file(){
     if [ $centosV = 8 ];then
         cp -rf $cur_dir/soft/dovecot.service /usr/lib/systemd/system
     fi
-    
-    cp -rf $cur_dir/config/dovecot /etc
-    cp -rf $cur_dir/config/postfix /etc
-    
+
+    if [ $centosV = 7 ];then
+        rm -rf /etc/dovecot /etc/postfix
+        cp -rf $cur_dir/config/el7-config/dovecot /etc
+        cp -rf $cur_dir/config/el7-config/postfix /etc
+    else
+        cp -rf $cur_dir/config/dovecot /etc
+        cp -rf $cur_dir/config/postfix /etc
+    fi
+
     mkdir -p /etc/ssl/certs
     mkdir -p /etc/ssl/private
     
