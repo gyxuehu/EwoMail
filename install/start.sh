@@ -49,6 +49,7 @@ fi
 
 postfix3_install(){
     pushd $cur_dir/soft/
+    tar zxvf ewomail-npm-1.09-1-el7.tar.gz
     yum install -y \
         ./postfix3-3.6.1-5.el7.x86_64.rpm \
         ./postfix3-ldap-3.6.1-5.el7.x86_64.rpm \
@@ -90,11 +91,7 @@ amavis_install(){
 }
 
 down_rpm(){
-    if [ $centosV = 7 ] ; then
-        cd $cur_dir/soft
-        tar xzvf ewomail-npm-1.09-1-el7.tar.gz
-        cd $cur_dir
-    elif [ $centosV = 8 ] ; then
+    if [ $centosV = 8 ] ; then
         cd $cur_dir/soft
         md5file="1aa30322e0fe8340655bdf7bbd1506b1"
         filename="ewomail-npm-1.09-el8.tar.gz"
