@@ -41,7 +41,19 @@ CPU：1核
 
 http://doc.ewomail.com/docs/ewomail/install
 
+**国外网络** 请在安装域名后面加空格加en，例如  sh ./start.sh ewomail.cn en
 
+### centos7/8
+
+```
+yum -y install git
+cd /root
+git clone https://github.com/gyxuehu/EwoMail.git
+cd /root/EwoMail/install
+#需要输入一个邮箱域名，不需要前缀，列如下面的ewomail.cn
+sh ./start.sh ewomail.cn
+```
+ **国外网络** 请在安装域名后面加空格加en，例如  sh ./start.sh ewomail.cn en
 
 ### 邮箱后台
 
