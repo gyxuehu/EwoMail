@@ -45,11 +45,12 @@ http://doc.ewomail.com/docs/ewomail/install
 
 ### 邮箱后台
 
-![ewomail-admin](https://images.gitee.com/uploads/images/2019/1231/142334_74d987df_325053.png "ewomail-admin")
+![ewomail-admin](https://box.kancloud.cn/c362878ba731559b09eae36b7236bde5_1366x609.png "ewomail-admin")
 
 ### webmail
 
-![webmail](https://images.gitee.com/uploads/images/2019/1231/142334_6daf7a2a_325053.png "webmail")
+![webmail](https://box.kancloud.cn/3de1da2809f14048fb4cb3b32d0408d1_1183x476.png "webmail")
+
 
 ### 安装或使用过程遇到问题
 
