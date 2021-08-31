@@ -53,6 +53,8 @@ return [
     '1209'=>'Website Title',
     '1210'=>'Language',
     '1211'=>'Verify Code',
+    '1212'=>'batch deletion',
+    '1213'=>'The bulk delete permission is temporarily closed, please create a file to open: ',
     
     
     //菜单语言包

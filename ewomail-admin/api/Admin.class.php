@@ -138,8 +138,8 @@ class Admin extends App
         $gid = intval(ipost('gid'));
         $super = intval(ipost('super'));
         $active = intval(ipost('active'));
-        $password = ipost('password');
-        $password2 = ipost('password2');
+        $password = trim($_POST['password']);
+        $password2 = trim($_POST['password2']);
         $is_password = intval(ipost('is_password'));
         $is_webmail = intval(ipost('is_webmail'));
         istatic([]);
@@ -210,24 +210,24 @@ class Admin extends App
     {
         istatic($data);
         $name = ipost('name');
-        $password = ipost('password');
-        $new_password = ipost('new_password');
-        $new_password2 = ipost('new_password2');
+        $password = trim($_POST['password']);
+        $new_password = trim($_POST['new_password']);
+        $new_password2 = trim($_POST['new_password2']);
         $is_password = ipost('is_password');
         istatic([]);
-        
-        if(md5($password)!=self::$info['password']){
-            E::error(2030);
-        }
+        $newData = [
+            'name'=>$name
+        ];
         
         if($is_password){
+            if(md5($password)!=self::$info['password']){
+                E::error(2030);
+            }
             User::checkPassword($new_password,$new_password2);
+            $newData['password'] = md5($new_password);
         }
         
-        $newData = [
-            'name'=>$name,
-            'password'=>md5($new_password)
-        ];
+        
         App::$db->update("admin",$newData,"aid=".self::$aid);
     }
 

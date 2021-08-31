@@ -38,8 +38,8 @@ class User extends App
     {
         istatic($data);
         $email = strtolower(ipost('email'));
-        $password = ipost('password');
-        $password2 = ipost('password2');
+        $password = trim($_POST['password']);
+        $password2 = trim($_POST['password2']);
         $is_password = intval(ipost('is_password'));
         $active = intval(ipost('active'));
         $limits = intval(ipost('limits'));
@@ -79,7 +79,7 @@ class User extends App
             $name = $arr[0];
             $domain = $arr[1];
             
-            if(strlen($name)<2){
+            if(strlen($name)<1){
                 E::error(3074);
             }
             
@@ -138,6 +138,7 @@ class User extends App
      */
     public function delete($id)
     {
+        $id = intval($id);
         $row = $this->getOne($id);
         $where = "id=$id";
         App::$db->delete("users",$where);

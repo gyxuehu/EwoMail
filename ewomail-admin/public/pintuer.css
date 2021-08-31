@@ -1681,8 +1681,8 @@ th {
 
 @font-face {
 	font-family: 'FontAwesome';
-	src: url('http://libs.baidu.com/fontawesome/4.1.0/fonts/fontawesome-webfont.eot?v=4.1.0');
-	src: url('http://libs.baidu.com/fontawesome/4.1.0/fonts/fontawesome-webfont.eot?#iefix&v=4.1.0') format('embedded-opentype'), url('http://libs.baidu.com/fontawesome/4.1.0/fonts/fontawesome-webfont.woff?v=4.1.0') format('woff'), url('http://libs.baidu.com/fontawesome/4.1.0/fonts/fontawesome-webfont.ttf?v=4.1.0') format('truetype'), url('http://libs.baidu.com/fontawesome/4.1.0/fonts/fontawesome-webfont.svg?v=4.1.0#fontawesomeregular') format('svg');
+	src: url('/public/fonts/fontawesome-webfont.eot');
+	src: url('/public/fonts/fontawesome-webfont.eot') format('embedded-opentype'), url('/public/fonts/fontawesome-webfont.woff') format('woff'), url('/public/fonts/fontawesome-webfont.ttf') format('truetype'), url('http://libs.baidu.com/fontawesome/4.1.0/fonts/fontawesome-webfont.svg?v=4.1.0#fontawesomeregular') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }

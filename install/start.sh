@@ -148,7 +148,6 @@ init(){
         exit 1
     fi
     
-    yum remove sendmail
     yum install epel-release
     
     if ! rpm -qa | grep epel-release > /dev/null;then
@@ -230,6 +229,8 @@ init(){
     systemctl start firewalld
     firewall-cmd --zone=public --add-port=8000/tcp --permanent 
     firewall-cmd --zone=public --add-port=8010/tcp --permanent 
+    firewall-cmd --zone=public --add-port=7000/tcp --permanent 
+    firewall-cmd --zone=public --add-port=7010/tcp --permanent 
     firewall-cmd --zone=public --add-port=8020/tcp --permanent 
     firewall-cmd --zone=public --add-port=993/tcp --permanent 
     firewall-cmd --zone=public --add-port=995/tcp --permanent 

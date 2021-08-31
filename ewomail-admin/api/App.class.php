@@ -59,8 +59,13 @@ class App
         $langPath = PATH."/lang/$lang.php";
         //加载语言包
         if(!file_exists($langPath)){
-            Cookie::set('lang','');
-            E::sys('语言包不存在，'.$langPath);
+            if(!file_exists(PATH."/lang/zh-cn.php")){
+                Cookie::set('lang','');
+                E::sys('语言包不存在，'.$langPath);
+            }else{
+                $lang = 'zh-cn';
+                $langPath = PATH."/lang/$lang.php";
+            }
         }
         $L = L('',$langPath);
         $langData = SystemConfig::getLang();

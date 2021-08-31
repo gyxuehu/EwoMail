@@ -69,9 +69,21 @@ Rout::get('index',function(){
 //邮件删除
 Rout::delete('index',function(){
     Admin::setMenu(101);
-    $id = iget('id');
+    $id = iany('id');
     $users = new User();
-    $users->delete($id);
+    if(is_array($id)){
+        $del_file = PATH."/cache/delete.txt";
+        if(!file_exists($del_file)){
+            E::error(L(1213).$del_file);
+        }
+        foreach($id as $v)
+        {
+            $users->delete(intval($v));
+        }
+    }else{
+        $users->delete(intval($id));
+    }
+    
     E::success(1003);
 });
 

@@ -50,14 +50,16 @@
 			</form>
 		</div>
 	</div>
-	<form method="post">
+	<form method="post" id="myform">
 		<div class="panel admin-panel">
 			<div class="panel-head"><strong>{$L.1101}</strong></div>
 			<div class="padding border-bottom">
 				<a href="{U('Users/edit')}" class="button button-small border-green">{$L.1100}</a>
+				<a href="#" class="button button-small border-yellow" onclick="delData('#myform','.ck')">{$L.1212}</a>
 			</div>
 			<table class="table table-hover">
 				<tr>
+					<th width="30"><input type="checkbox" onclick="checkboxAll(this,'.ck')" /></th>
 					<th>{$L.3012}</th>
 					<th width="200">{$L.3023}</th>
 					<th width="200">{$L.3024}</th>
@@ -67,6 +69,7 @@
 				</tr>
 				{foreach $list as $v}
 				<tr>
+					<td><input type="checkbox" class="ck" name="id[]" value="{$v.id}" /></td>
 					<td>{$v.email}</td>
 					<td>{$v.uname}</td>
 					<td>{$v.tel}</td>
@@ -89,6 +92,7 @@
 			<div class="page">{$page}</div>
 			
 		</div>
+		<input type="hidden" name="_method" value="put" />
 	</form>
 </div>
 <script>

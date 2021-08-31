@@ -113,7 +113,7 @@ class Rout
                     'status'=>-100,
                     'msg'=>'系统错误：'.$e->getMessage()
                 ];
-                if(IS_AJAX || defined("IS_API")){
+                if((defined("IS_AJAX") && IS_AJAX) || defined("IS_API")){
                     echo json_encode($arr);
                 }else{
                     echo $arr['msg'];
@@ -126,7 +126,7 @@ class Rout
                     'url'=>$e->url,
                     'data'=>$e->data
                 ];
-                if(IS_AJAX || defined("IS_API")){
+                if((defined("IS_AJAX") && IS_AJAX) || defined("IS_API")){
                     header('Content-Type:application/json; charset=utf-8');
                     echo json_encode($arr);
                     exit;
