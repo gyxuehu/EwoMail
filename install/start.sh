@@ -37,9 +37,9 @@ fi
 
 dovecot_install(){
     if [ $centosV = 7 ] ; then 
-        rpm -ivh $cur_dir/soft/dovecot-2.3.11.3-el7.x86_64.rpm
+        rpm -ivh $cur_dir/soft/dovecot-2.3.15-el7.x86_64.rpm
     else
-        rpm -ivh $cur_dir/soft/dovecot-2.3.11.3-el8.x86_64.rpm
+        rpm -ivh $cur_dir/soft/dovecot-2.3.15-el8.x86_64.rpm
     fi
     
     if ! rpm -qa | grep dovecot > /dev/null;then
@@ -65,11 +65,11 @@ down_rpm(){
     filename=""
     md5file=""
     if [ $centosV = 7 ] ; then 
-        md5file="ebd320c8ca86a3b8c4430e350d14cff8"
-        filename="ewomail-npm-1.09-el7.tar.gz"
+        md5file="0a91bcaaf4bddf7095bf824a7206ab97"
+        filename="ewomail-npm-1.15.1-el7.tar.gz"
     else
-        md5file="1aa30322e0fe8340655bdf7bbd1506b1"
-        filename="ewomail-npm-1.09-el8.tar.gz"
+        md5file="f2f2536390aa3fa1277c3d3034e88db0"
+        filename="ewomail-npm-1.15.1-el8.tar.gz"
     fi
     
     if [ "$en" != "en" ] ; then 
