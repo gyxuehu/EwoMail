@@ -148,7 +148,7 @@ init(){
         exit 1
     fi
     
-    yum install -y epel-release
+    yum install epel-release
     
     if ! rpm -qa | grep epel-release > /dev/null;then
         echo "epel-release Installation failed"
@@ -215,7 +215,7 @@ init(){
     
     mkdir -p /ewomail/dkim
     chown -R amavis:amavis /ewomail/dkim
-    amavisd genrsa /ewomail/dkim/mail.pem 2048
+    amavisd genrsa /ewomail/dkim/mail.pem
     chown -R amavis:amavis /ewomail/dkim
     
     service mysqld start
