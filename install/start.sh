@@ -215,7 +215,7 @@ init(){
     
     mkdir -p /ewomail/dkim
     chown -R amavis:amavis /ewomail/dkim
-    amavisd genrsa /ewomail/dkim/mail.pem 2048
+    amavisd genrsa /ewomail/dkim/mail.pem
     chown -R amavis:amavis /ewomail/dkim
     
     service mysqld start
