@@ -148,7 +148,7 @@ init(){
         exit 1
     fi
     
-    yum install -y epel-release
+    yum install epel-release
     
     if ! rpm -qa | grep epel-release > /dev/null;then
         echo "epel-release Installation failed"
