@@ -52,6 +52,13 @@ cd /root/EwoMail/install
 sh ./start.sh ewomail.cn
 ```
  **国外网络** 请在安装域名后面加空格加en，例如  sh ./start.sh ewomail.cn en
+ 
+ 安装教程
+
+http://doc.ewomail.com/docs/ewomail/install
+
+更新教程
+http://doc.ewomail.com/docs/ewomail/update
 
 ### 邮箱后台
 
@@ -61,12 +68,6 @@ sh ./start.sh ewomail.cn
 
 ![webmail](https://box.kancloud.cn/3de1da2809f14048fb4cb3b32d0408d1_1183x476.png "webmail")
 
-安装教程
-
-http://doc.ewomail.com/docs/ewomail/install
-
-更新教程
-http://doc.ewomail.com/docs/ewomail/update
 
 ### 安装或使用过程遇到问题
 
