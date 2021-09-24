@@ -1,12 +1,8 @@
-### 1.15更新说明
+### 1.15.1更新说明
 
 修复部分问题，添加邮箱批量删除，添加web SSL默认配置启用。
 
 更新组件
-
-
-更新教程
-http://doc.ewomail.com/docs/ewomail/update
 
 ### EwoMail
 
@@ -41,9 +37,7 @@ CPU：1核
 
 带宽：1-3M
 
-安装教程
 
-http://doc.ewomail.com/docs/ewomail/install
 
 **国外网络** 请在安装域名后面加空格加en，例如  sh ./start.sh ewomail.cn en
 
@@ -58,6 +52,13 @@ cd /root/EwoMail/install
 sh ./start.sh ewomail.cn
 ```
  **国外网络** 请在安装域名后面加空格加en，例如  sh ./start.sh ewomail.cn en
+ 
+ 安装教程
+
+http://doc.ewomail.com/docs/ewomail/install
+
+更新教程
+http://doc.ewomail.com/docs/ewomail/update
 
 ### 邮箱后台
 
