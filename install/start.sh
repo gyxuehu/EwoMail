@@ -125,6 +125,9 @@ config_file(){
     cd /usr/local/dovecot/share/doc/dovecot
     sed -i "s/ewomail.cn/$domain/g" dovecot-openssl.cnf
     sh mkcert.sh
+
+    # spamassassin - drop AHBL DNSbl
+    sed -i 's/^[^#].*DNS_FROM_AHBL_RHSBL*/# &/g' /usr/share/spamassassin/20_dnsbl_tests.cf
 }
 
 epel_replace()
